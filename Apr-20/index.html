@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+    
+<body>
+
+  <h1 id="mainHeading">JAVASCRIPT TASKS</h1>
+
+  <input 
+    type="text" 
+    id="headingInput" 
+    placeholder="Enter new heading">
+
+  <button onclick="setCustomHeading()">
+    Update Heading
+  </button>
+
+  <script>
+    function setCustomHeading() {
+      const inputValue = document.getElementById('headingInput').value;
+      const heading = document.getElementById('mainHeading');
+
+    
+      if (inputValue.trim() === "") {
+        alert("Please enter YOUR heading!");
+        return;
+      }
+
+      
+      heading.innerText = inputValue;
+
+     
+      const hue = Math.floor(Math.random() * 360);
+      const saturation = 70;
+      const lightness = 50;
+
+      heading.style.color = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+
+    
+      document.getElementById('headingInput').value = "";
+    }
+  </script>
+
+  <br>
+  <br>
+  <br>
+  <br>
+  <br><hr>
+
+
+
+  <h1>TASK-2:Random Background Color Changer</h1>
+
+  <button onclick="changeBackground()">
+    Change Background
+  </button>
+
+  <script>
+    function changeBackground() {
+      const r = Math.floor(Math.random() * 256);
+      const g = Math.floor(Math.random() * 256);
+      const b = Math.floor(Math.random() * 256);
+
+      document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+    }
+  </script>
+
+<br><br><br><br><br><hr>
+
+
+ <h1>TASK-3:Dynamic Time Display</h1>
+
+  <button onclick="showTime()">Show Time</button>
+
+  <p id="timeDisplay"></p>
+
+  <script>
+    let timer;
+
+    function showTime() {
+      const display = document.getElementById('timeDisplay');
+
+      if (timer) return; // prevent multiple intervals
+
+      timer = setInterval(() => {
+        const now = new Date();
+        display.innerText = now.toLocaleTimeString();
+      });
+    }
+  </script>
+
+  <br><br><br><br><hr>
+
+
+   <h1>TASK-4:State-Based Counter</h1>
+
+  <p id="counterDisplay">0</p>
+
+  <button onclick="changeCounter(1)">Increase</button>
+  <button onclick="changeCounter(-1)">Decrease</button>
+  <button onclick="resetCounter()">Reset</button>
+
+  <script>
+    let counter = 0;
+
+    function changeCounter(value) {
+      counter += value;
+      updateDisplay();
+    }
+
+    function resetCounter() {
+      counter = 0;
+      updateDisplay();
+    }
+
+    function updateDisplay() {
+      const display = document.getElementById('counterDisplay');
+      display.innerText = counter;
+
+      if (counter > 0) {
+        display.style.color = "green";
+      } else if (counter < 0) {
+        display.style.color = "red";
+      } else {
+        display.style.color = "black";
+      }
+    }
+  </script>
+<br>
+<br>
+<br>
+<br>
+<hr>
+
+
+<h1>TASK-5: Master Reset</h1>
+
+<button onclick="masterReset()">Reset</button>
+
+
+<script>
+    function masterReset() {
+  // Reset heading
+  const heading = document.getElementById('mainHeading');
+  heading.innerText = "JAVASCRIPT TASKS";
+  heading.style.color = "black";
+
+  // Reset background
+  document.body.style.backgroundColor = "white";
+
+  // Reset counter
+  counter = 0;
+  updateDisplay();
+
+  // Stop and hide time
+  clearInterval(timer);
+  timer = null;
+  document.getElementById('timeDisplay').innerText = "";
+
+  // Clear input field
+  document.getElementById('headingInput').value = "";
+}
+</script>
+
+
+<br><br><br><br><hr>
+
+
+
+ <h1>BONUS TASk</h1>
+   <button onclick="toggleDarkMode()" id="themeBtn"> Dark Mode</button>
+   <br><br><br><hr>
+
+</button>
+
+<script>
+     // Dark Mode
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+
+      const btn = document.getElementById("themeBtn");
+      btn.innerText = document.body.classList.contains("dark")
+        ? " Light Mode"
+        : " Dark Mode";
+    }
+</script>
+
+ 
+
+
+
+</body>
+</html>
