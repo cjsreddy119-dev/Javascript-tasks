@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Course Management Portal</title>
+    <style>
+        /* CSS - Modern UI Styling */
+        :root {
+            --primary: #2563eb;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --bg: #f1f5f9;
+            --card: #ffffff;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            padding: 20px;
+            
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e293b;
+            margin-bottom: 30px;
+        }
+
+        /* Form Styling (Task 6) */
+        .card-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        input,
+        select {
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+        }
+
+        /* Filter Controls (Tasks 1, 2, 4, 7) */
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex-grow: 2;
+        }
+
+        /* Course Grid Styling */
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .course-card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s;
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .highlight {
+            background: #fde047;
+            font-weight: bold;
+        }
+
+        /* Seat Indicators (Task 3) */
+        .seat-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .available {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .full {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-primary:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        /* Modal (Task 5) */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 500px;
+            margin: 100px auto;
+            padding: 30px;
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 28px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Student Course Portal</h1>
+
+        <div class="card-panel">
+            <h3 style="margin-top:0">Add New Course</h3>
+            <form id="addCourseForm" class="form-grid">
+                <input type="text" id="nameIn" placeholder="Course Title" required>
+                <input type="text" id="deptIn" placeholder="Department" required>
+                <input type="number" id="seatsIn" placeholder="Total Seats" min="1" required>
+                <button type="submit" class="btn-primary" style="margin:0">Add Course</button>
+            </form>
+        </div>
+
+        <div class="card-panel controls">
+            <input type="text" id="searchBar" class="search-box" placeholder="Search courses by name..."
+                oninput="displayCourses()">
+
+            <select id="filterDept" onchange="displayCourses()">
+                <option value="All">All Departments</option>
+            </select>
+
+            <select id="sortSeats" onchange="displayCourses()">
+                <option value="none">Sort by Seats</option>
+                <option value="low">Seats: Low to High</option>
+                <option value="high">Seats: High to Low</option>
+            </select>
+
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" id="checkAvailable" onchange="displayCourses()"> Only Available
+            </label>
+        </div>
+
+        <div id="courseList" class="course-grid"></div>
+    </div>
+
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closePopup()">&times;</span>
+            <div id="modalData"></div>
+        </div>
+    </div>
+
+    <script>
+      
+        let courses = JSON.parse(localStorage.getItem('portal_courses')) || [
+            { id: 101, name: "Data Structures", dept: "CS", seats: 12 },
+            { id: 102, name: "Digital Marketing", dept: "Business", seats: 0 },
+            { id: 103, name: "UI/UX Design", dept: "Design", seats: 5 }
+        ];
+
+        const courseListEl = document.getElementById('courseList');
+        const deptSelect = document.getElementById('filterDept');
+
+        
+        document.getElementById('addCourseForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newCourse = {
+                id: Date.now(),
+                name: document.getElementById('nameIn').value,
+                dept: document.getElementById('deptIn').value,
+                seats: parseInt(document.getElementById('seatsIn').value)
+            };
+            courses.push(newCourse);
+            syncData();
+            e.target.reset();
+        });
+
+       
+        function syncData() {
+            localStorage.setItem('portal_courses', JSON.stringify(courses));
+            refreshDeptList();
+            displayCourses();
+        }
+
+      
+        function refreshDeptList() {
+            const uniqueDepts = ['All', ...new Set(courses.map(c => c.dept))];
+            deptSelect.innerHTML = uniqueDepts.map(d => `<option value="${d}">${d}</option>`).join('');
+        }
+
+       
+        function displayCourses() {
+            const search = document.getElementById('searchBar').value.toLowerCase();
+            const dept = deptSelect.value;
+            const sort = document.getElementById('sortSeats').value;
+            const onlyAvail = document.getElementById('checkAvailable').checked;
+
+            
+            let filtered = courses.filter(c => {
+                const matchesSearch = c.name.toLowerCase().includes(search);
+                const matchesDept = (dept === "All" || c.dept === dept);
+                const matchesAvail = onlyAvail ? c.seats > 0 : true;
+                return matchesSearch && matchesDept && matchesAvail;
+            });
+
+            
+            if (sort === 'low') filtered.sort((a, b) => a.seats - b.seats);
+            if (sort === 'high') filtered.sort((a, b) => b.seats - a.seats);
+
+            courseListEl.innerHTML = '';
+
+            filtered.forEach(course => {
+                // Task 7: Highlight Matching Text
+                let displayName = course.name;
+                if (search) {
+                    const regex = new RegExp(`(${search})`, 'gi');
+                    displayName = course.name.replace(regex, `<span class="highlight">$1</span>`);
+                }
+
+                const card = document.createElement('div');
+                card.className = 'course-card';
+                card.innerHTML = `
+                <h3 onclick="openPopup(${course.id})" style="cursor:pointer; color:var(--primary)">${displayName}</h3>
+                <p><strong>Department:</strong> ${course.dept}</p>
+                <div style="margin: 15px 0;">
+                    <span class="seat-badge ${course.seats > 0 ? 'available' : 'full'}">
+                        ${course.seats > 0 ? course.seats + ' Seats Left' : 'Full '}
+                    </span>
+                </div>
+                <button 
+                    class="btn-primary" 
+                    onclick="enrollUser(${course.id})" 
+                    ${course.seats === 0 ? 'disabled' : ''}>
+                    ${course.seats > 0 ? 'Enroll Now' : 'Class Full'}
+                </button>
+            `;
+                courseListEl.appendChild(card);
+            });
+        }
+
+        
+        function enrollUser(id) {
+            const index = courses.findIndex(c => c.id === id);
+            if (index !== -1 && courses[index].seats > 0) {
+                courses[index].seats--; // Reduce count [cite: 14]
+                syncData(); // Update UI instantly [cite: 15, 24]
+            }
+        }
+
+       
+        function openPopup(id) {
+            const course = courses.find(c => c.id === id);
+            document.getElementById('modalData').innerHTML = `
+            <h2>${course.name}</h2>
+            <p><strong>Department:</strong> ${course.dept}</p>
+            <p><strong>Status:</strong> ${course.seats > 0 ? 'Open for Enrollment' : 'Waitlist Only'}</p>
+            <p><strong>Course ID:</strong> REG-${course.id}</p>
+            <p style="color:#64748b">This course is part of the 2026 Academic Catalog.</p>
+        `;
+            document.getElementById('detailModal').style.display = 'block';
+        }
+
+        function closePopup() {
+            document.getElementById('detailModal').style.display = 'none';
+        }
+
+        
+        refreshDeptList();
+        displayCourses();
+    </script>
+
+</body>
+
+</html>
