@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Typing Test Pro</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  transition: 0.3s;
+}
+
+h2{
+    text-align: center;
+}
+
+.dark {
+  background: #121212;
+  color: white;
+}
+
+.container {
+  width: 90%;
+  max-width: 750px;
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.dark .container {
+  background: #1e1e1e;
+}
+
+input, textarea, button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+textarea {
+  height: 120px;
+  resize: none;
+}
+
+button {
+  background: #667eea;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+#testSection { display: none; }
+
+#textDisplay span.correct { color: green; }
+#textDisplay span.incorrect { color: red; }
+
+#textDisplay {
+  background: #f1f3ff;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: left;
+  line-height: 1.5;
+}
+
+.progress {
+  height: 8px;
+  background: #ddd;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: #667eea;
+  border-radius: 5px;
+}
+
+.results, .leaderboard {
+  margin-top: 15px;
+  background: #f5f5f5;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.dark .results, .dark .leaderboard {
+  background: #2a2a2a;
+}
+
+.toggle {
+  float: right;
+  cursor: pointer;
+  font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+
+<!-- LANDING -->
+<div id="formSection">
+<h2>Typing Test</h2>
+<input id="name" placeholder="Enter Name">
+<input id="email" placeholder="Enter Email">
+<div id="error" style="color:red;"></div>
+<button onclick="startTest()">Start Test</button>
+</div>
+
+<!-- TEST -->
+<div id="testSection">
+<h2>Typing Speed Test</h2>
+
+<div id="timer">60s</div>
+
+<div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+
+<div id="textDisplay"></div>
+
+<textarea id="typingArea" placeholder="Start typing..."></textarea>
+
+<div id="liveStats"></div>
+
+<button onclick="submitTest()">Submit</button>
+<button onclick="restart()">Restart</button>
+
+<div class="results" id="results"></div>
+
+<div class="leaderboard" id="leaderboard"></div>
+
+</div>
+
+</div>
+
+<script>
+const text = "Typing regularly improves your speed, accuracy, and overall productivity in daily computer tasks.";
+
+let startTime, timerStarted=false, timeLeft=60, interval;
+
+const typingArea = document.getElementById("typingArea");
+const display = document.getElementById("textDisplay");
+
+function renderText() {
+  display.innerHTML = "";
+  text.split("").forEach(char => {
+    const span = document.createElement("span");
+    span.innerText = char;
+    display.appendChild(span);
+  });
+}
+renderText();
+
+function startTest() {
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const error = document.getElementById("error");
+
+  if (!name || !email) {
+    error.innerText = "Fill all fields";
+    return;
+  }
+
+  error.innerText = "";
+  document.getElementById("formSection").style.display="none";
+  document.getElementById("testSection").style.display="block";
+}
+
+typingArea.addEventListener("input", () => {
+  if (!timerStarted) {
+    startTime = new Date();
+    startTimer();
+    timerStarted=true;
+  }
+
+  const typed = typingArea.value.split("");
+  const spans = display.querySelectorAll("span");
+
+  let correct = 0;
+
+  spans.forEach((span, i) => {
+    const char = typed[i];
+
+    if (char == null) {
+      span.classList.remove("correct","incorrect");
+    } else if (char === span.innerText) {
+      span.classList.add("correct");
+      span.classList.remove("incorrect");
+      correct++;
+    } else {
+      span.classList.add("incorrect");
+      span.classList.remove("correct");
+    }
+  });
+
+  // Live stats
+  const timeNow = (new Date() - startTime)/1000;
+  const wpm = Math.round(((typed.length/5)/timeNow)*60 || 0);
+  const accuracy = Math.round((correct / text.length)*100);
+
+  document.getElementById("liveStats").innerHTML =
+    ` WPM: ${wpm} |  Accuracy: ${accuracy}%`;
+});
+
+function startTimer() {
+  interval = setInterval(() => {
+    timeLeft--;
+    document.getElementById("timer").innerText = timeLeft + "s";
+
+    document.getElementById("progressBar").style.width =
+      ((60-timeLeft)/60)*100 + "%";
+
+    if (timeLeft <= 0) {
+      clearInterval(interval);
+      submitTest();
+    }
+  }, 1000);
+}
+
+function submitTest() {
+  clearInterval(interval);
+
+  const endTime = new Date();
+  const timeTaken = Math.round((endTime - startTime)/1000);
+
+  const typed = typingArea.value.trim();
+
+  const typedWords = typed.split(" ");
+  const originalWords = text.split(" ");
+
+  let correctWords = 0;
+
+  typedWords.forEach((word, i) => {
+    if (word === originalWords[i]) {
+      correctWords++;
+    }
+  });
+
+  const wrongWords = typedWords.length - correctWords;
+
+  const wpm = Math.round((typedWords.length / timeTaken) * 60 || 0);
+  const accuracy = Math.round((correctWords / originalWords.length) * 100);
+
+  const name = document.getElementById("name").value;
+
+  document.getElementById("results").innerHTML =
+    `Name: ${name}<br>
+     Time: ${timeTaken}s<br>
+     WPM: ${wpm}<br>
+     Accuracy: ${accuracy}%<br>
+     Correct Words: ${correctWords}<br>
+     Wrong Words: ${wrongWords}`;
+
+  saveResult(name, wpm, accuracy);
+
+  typingArea.disabled = true;
+}
+
+
+
+function saveResult(name, wpm, accuracy) {
+  let data = JSON.parse(localStorage.getItem("scores")) || [];
+
+  data.push({name, wpm, accuracy});
+
+  localStorage.setItem("scores", JSON.stringify(data));
+
+  
+}
+
+
+</script>
+
+</body>
+</html>
