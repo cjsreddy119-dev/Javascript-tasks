@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>JS Learning Platform</title>
+
+<style>
+body {
+    font-family: "Segoe UI", sans-serif;
+    margin: 0;
+    background: #f4f7fb;
+}
+
+/* HEADER */
+header {
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: white;
+    padding: 25px;
+    text-align: center;
+}
+
+/* PAGE WRAPPER */
+.container {
+    width: 92%;
+    margin: auto;
+    padding: 20px 0;
+}
+
+/* SECTION TITLE */
+.section-title {
+    font-size: 20px;
+    margin: 20px 0 10px;
+    color: #1e3c72;
+}
+
+/* GRID (3 CARDS PER ROW) */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+/* CARD */
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: 0.2s;
+    border-left: 5px solid #2a5298;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* TITLE INSIDE CARD */
+.card h3 {
+    margin: 0 0 10px;
+    color: #1e3c72;
+    font-size: 16px;
+}
+
+/* TEXT */
+.card p {
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+    white-space: pre-line;
+}
+
+/* CODE STYLE */
+.code {
+    background: #eef2ff;
+    padding: 6px;
+    border-radius: 6px;
+    font-family: monospace;
+    display: block;
+    margin-top: 8px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+    .grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1> JavaScript Learning Platform</h1>
+<p>Variables • Data Types • Scope • Conversion</p>
+</header>
+
+<div class="container">
+
+<!-- VARIABLES SECTION -->
+<div class="section-title">📦 Variables</div>
+<div class="grid">
+
+<div class="card">
+<h3>What is a Variable?</h3>
+<p>A variable is a container used to store data.
+
+Think of it like a box where we keep values.</p>
+<span class="code">let student = "Ravi";</span>
+</div>
+
+<div class="card">
+<h3>Variable Declaration</h3>
+<p>We can declare variables using:
+
+• var (old method)  
+• let (modern, changeable)  
+• const (fixed value)</p>
+<span class="code">let age = 20;</span>
+</div>
+
+<div class="card">
+<h3>Naming Rules</h3>
+<p>✔ Can use letters, $, _  
+✔ Must be meaningful  
+❌ Cannot start with number</p>
+<span class="code">studentName ✔</span>
+</div>
+
+<div class="card">
+<h3>Scope</h3>
+<p>Scope defines where a variable can be used.
+
+• Global → anywhere  
+• Local → inside function</p>
+<span class="code">
+function test(){
+  let x = 10;
+}
+</span>
+</div>
+
+<div class="card">
+<h3>Reassignment</h3>
+<p>We can change value of let variables.
+
+Used in dynamic systems like seats.</p>
+<span class="code">
+let seats = 50;
+seats = 49;
+</span>
+</div>
+
+</div>
+
+<!-- DATA TYPES -->
+<div class="section-title">🔢 Data Types</div>
+<div class="grid">
+
+<div class="card">
+<h3>What are Data Types?</h3>
+<p>Data type defines what kind of value a variable holds.
+
+Example: number, text, true/false</p>
+</div>
+
+<div class="card">
+<h3>Primitive Types</h3>
+<p>Basic single values:
+
+• String  
+• Number  
+• Boolean  
+• Null  
+• Undefined</p>
+<span class="code">let marks = 90;</span>
+</div>
+
+<div class="card">
+<h3>Non-Primitive Types</h3>
+<p>Stores multiple values:
+
+• Array  
+• Object</p>
+<span class="code">
+let arr = ["CSE", "ECE"];
+</span>
+</div>
+
+<div class="card">
+<h3>Type Checking</h3>
+<p>We use typeof to check data type.</p>
+<span class="code">typeof 10 → number</span>
+</div>
+
+<div class="card">
+<h3>Type Conversion</h3>
+<p>Converting one type to another:
+
+String → Number or Number → String</p>
+<span class="code">
+Number("20") → 20
+</span>
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>
