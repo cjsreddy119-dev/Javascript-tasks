@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <link rel="stylesheet" href="style.css">
+    
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h2>OPPTY-TASKS</h2>
+        </header>
+
+        <div class="date-wrapper">
+            <label>Working Date</label>
+            <input type="date" id="taskDate">
+        </div>
+        
+        <div class="table-container">
+            <table id="taskTable">
+                <thead>
+                    <tr>
+                        <th style="width: 50px; text-align: center;">Num</th>
+                        <th>Task Name</th>
+                        <th style="width: 60px; text-align: center;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td class="sl-no">1</td><td><input type="text" class="task-input" placeholder="Enter task name..."></td><td class="checkbox-cell"><input type="checkbox"></td></tr>
+                    <tr><td class="sl-no">2</td><td><input type="text" class="task-input" placeholder="Enter task name..."></td><td class="checkbox-cell"><input type="checkbox"></td></tr>
+                    <tr><td class="sl-no">3</td><td><input type="text" class="task-input" placeholder="Enter task name..."></td><td class="checkbox-cell"><input type="checkbox"></td></tr>
+                    <tr><td class="sl-no">4</td><td><input type="text" class="task-input" placeholder="Enter task name..."></td><td class="checkbox-cell"><input type="checkbox"></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <button id="saveBtn">Save Changes</button>
+            <div id="statusMsg"></div>
+        </div>
+    </div>
+
+
+
+
+    <script src="script.js"></script>
+</body>
+</html>
