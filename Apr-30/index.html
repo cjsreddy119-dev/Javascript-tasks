@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Live Location Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <style>
+    /* Global Reset & Base Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      /* Animated Gradient Background */
+      background: linear-gradient(-45deg, #e0c3fc, #8ec5fc, #dfe9f3, #ffffff);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Glassmorphism Card Container */
+    .container {
+      width: 90%;
+      max-width: 420px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 24px;
+      padding: 35px 25px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 
+                  inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+      text-align: center;
+      /* Entrance Animation */
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+      animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes slideUpFade {
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Header / Icon Area */
+    .header-icon {
+      position: relative;
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #eef2f6;
+      border-radius: 50%;
+      box-shadow: 0 4px 10px rgba(0, 123, 255, 0.15);
+      color: #007bff;
+      z-index: 1;
+    }
+
+    /* Radar Ping Animation (Active state) */
+    .header-icon.locating::before,
+    .header-icon.locating::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: rgba(0, 123, 255, 0.3);
+      animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+      z-index: -1;
+    }
+
+    .header-icon.locating::after {
+      animation-delay: 0.75s;
+    }
+
+    @keyframes ping {
+      75%, 100% {
+        transform: scale(2.5);
+        opacity: 0;
+      }
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #777;
+      margin-bottom: 25px;
+    }
+
+    /* Data Display Area */
+    .display-box {
+      background: #f8faff;
+      border: 1px solid #e1e8ed;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .data-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px dashed #d1d9e0;
+      padding-bottom: 10px;
+    }
+
+    .data-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #555;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .label svg {
+      width: 16px;
+      height: 16px;
+      color: #007bff;
+    }
+
+    .value {
+      font-size: 16px;
+      font-weight: 500;
+      color: #222;
+      font-family: monospace;
+      /* Value reveal animation */
+      opacity: 0.3;
+      transform: translateX(10px);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .value.show {
+      opacity: 1;
+      transform: translateX(0);
+      color: #007bff;
+    }
+
+    .status-text {
+      font-size: 14px;
+      font-weight: 500;
+      height: 20px;
+      color: #007bff;
+      transition: color 0.3s;
+    }
+
+    .status-text.error {
+      color: #dc3545;
+    }
+
+    /* Button Styling */
+    .btn-container {
+      position: relative;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 14px;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Primary Start Tracking Button */
+    #locate-btn {
+      background: linear-gradient(135deg, #007bff, #0056b3);
+      box-shadow: 0 8px 15px rgba(0, 123, 255, 0.3);
+    }
+
+    #locate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 20px rgba(0, 123, 255, 0.4);
+      background: linear-gradient(135deg, #006ce4, #004494);
+    }
+
+    #locate-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+    }
+
+    /* Stop Tracking State */
+    #locate-btn.tracking {
+      background: linear-gradient(135deg, #dc3545, #a71d2a);
+      box-shadow: 0 8px 15px rgba(220, 53, 69, 0.3);
+    }
+
+    #locate-btn.tracking:hover {
+      background: linear-gradient(135deg, #c82333, #bd2130);
+      box-shadow: 0 12px 20px rgba(220, 53, 69, 0.4);
+    }
+
+    /* Secondary Maps Button */
+    .maps-btn {
+      background: transparent;
+      border: 2px solid #007bff;
+      color: #007bff;
+      margin-top: 15px;
+      display: none; /* Hidden by default */
+    }
+
+    .maps-btn:hover {
+      background: rgba(0, 123, 255, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .maps-btn.show {
+      display: flex;
+    }
+
+    button svg {
+      width: 20px;
+      height: 20px;
+      transition: transform 0.3s ease;
+    }
+
+    button:hover svg {
+      transform: translateY(-2px);
+    }
+
+    /* Button Ripple Effect */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      animation: ripple-animation 0.6s linear;
+      background-color: rgba(255, 255, 255, 0.4);
+      pointer-events: none;
+    }
+
+    @keyframes ripple-animation {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="header-icon" id="radar-icon">
+      <!-- Location Pin SVG -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+        <circle cx="12" cy="10" r="3"></circle>
+      </svg>
+    </div>
+
+    <h1 class="title">Live GPS Location</h1>
+    <p class="subtitle">Continuously track your real-time coordinates</p>
+
+    <div class="display-box">
+      <div class="data-row">
+        <div class="label">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          Latitude
+        </div>
+        <div id="latitude" class="value">--.------</div>
+      </div>
+
+      <div class="data-row">
+        <div class="label">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          Longitude
+        </div>
+        <div id="longitude" class="value">--.------</div>
+      </div>
+
+      <div id="status" class="status-text">Ready to locate</div>
+    </div>
+
+    <div class="btn-container">
+      <button id="locate-btn" onclick="toggleTracking(event)">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span>Start GPS Tracking</span>
+      </button>
+
+      <button id="maps-btn" class="maps-btn" onclick="openInMaps(event)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
+          <line x1="9" y1="3" x2="9" y2="21"></line>
+          <line x1="15" y1="3" x2="15" y2="21"></line>
+        </svg>
+        Open in Google Maps
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let watchId = null;
+    let currentLat = null;
+    let currentLon = null;
+
+    // Ripple Effect Logic for Button
+    function createRipple(event) {
+      const button = event.currentTarget;
+      const circle = document.createElement("span");
+      const diameter = Math.max(button.clientWidth, button.clientHeight);
+      const radius = diameter / 2;
+
+      const rect = button.getBoundingClientRect();
+      circle.style.width = circle.style.height = `${diameter}px`;
+      circle.style.left = `${event.clientX - rect.left - radius}px`;
+      circle.style.top = `${event.clientY - rect.top - radius}px`;
+      circle.classList.add("ripple");
+
+      const ripple = button.querySelector(".ripple");
+      if (ripple) {
+        ripple.remove();
+      }
+
+      button.appendChild(circle);
+    }
+
+    function toggleTracking(event) {
+      createRipple(event);
+
+      const latEl = document.getElementById("latitude");
+      const lonEl = document.getElementById("longitude");
+      const statusEl = document.getElementById("status");
+      const radarIcon = document.getElementById("radar-icon");
+      const btn = document.getElementById("locate-btn");
+      const mapsBtn = document.getElementById("maps-btn");
+
+      // If we are currently tracking, stop it
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+
+        btn.classList.remove("tracking");
+        btn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span>Start GPS Tracking</span>
+        `;
+        
+        radarIcon.classList.remove("locating");
+        statusEl.textContent = "GPS Tracking paused.";
+        statusEl.style.color = "#555";
+        return;
+      }
+
+      // Start Tracking
+      statusEl.className = "status-text";
+      statusEl.textContent = "Acquiring GPS Signal...";
+      statusEl.style.color = "#007bff";
+      radarIcon.classList.add("locating");
+      
+      btn.classList.add("tracking");
+      btn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+        </svg>
+        <span>Stop GPS Tracking</span>
+      `;
+
+      if (!navigator.geolocation) {
+        radarIcon.classList.remove("locating");
+        statusEl.textContent = "Geolocation is not supported by your browser.";
+        statusEl.classList.add("error");
+        btn.classList.remove("tracking");
+        return;
+      }
+
+      // Fetch Position Continuously using GPS hardware
+      watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          currentLat = position.coords.latitude.toFixed(6);
+          currentLon = position.coords.longitude.toFixed(6);
+
+          // Update UI with values
+          latEl.textContent = currentLat;
+          lonEl.textContent = currentLon;
+          latEl.classList.add("show");
+          lonEl.classList.add("show");
+          
+          statusEl.textContent = "Live GPS Location Active";
+          statusEl.style.color = "#28a745"; // Success green
+
+          // Reveal Map button once we have valid coordinates
+          mapsBtn.classList.add("show");
+        },
+        (error) => {
+          statusEl.classList.add("error");
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              statusEl.textContent = "Permission denied. Please allow GPS access.";
+              // Stop attempting tracking if permission is outright denied
+              if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+                btn.classList.remove("tracking");
+                radarIcon.classList.remove("locating");
+              }
+              break;
+            case error.POSITION_UNAVAILABLE:
+              statusEl.textContent = "GPS signal lost or unavailable.";
+              break;
+            case error.TIMEOUT:
+              statusEl.textContent = "Still searching for GPS signal...";
+              break;
+            default:
+              statusEl.textContent = "An unknown error occurred.";
+              break;
+          }
+        },
+        // Geolocation Options optimized for GPS hardware tracking
+        {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 0
+        }
+      );
+    }
+
+    function openInMaps(event) {
+      createRipple(event);
+      if (currentLat && currentLon) {
+        const mapsUrl = `https://www.google.com/maps/@15.0799568,78.4967282,13z?entry=ttu&g_ep=EgoyMDI2MDQyNy4wIKXMDSoASAFQAw%3D%3D=${currentLat},${currentLon}`;
+        setTimeout(() => {
+          window.open(mapsUrl, '_blank');
+        }, 300); // Slight delay to let ripple animation play
+      }
+    }
+  </script>
+
+</body>
+</html>
