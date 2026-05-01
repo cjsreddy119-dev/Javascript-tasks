@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Development Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Variables for consistent theming */
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --success: #10b981;
+            --danger: #ef4444;
+            --background: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --locked-bg: #f3f4f6;
+        }
+
+        /* --- NEW ANIMATIONS --- */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes scaleUp {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        @keyframes slideInFade {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeUpOptions {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        
+        @keyframes pulseRetry {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(79, 70, 229, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+        }
+
+        @keyframes floatUpAnim {
+            0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(360deg) scale(1.5); opacity: 0; }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            /* Modern Animated Gradient Background */
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Container and Card Styles */
+        .app-container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            position: relative;
+            animation: scaleUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 10;
+        }
+
+        .screen {
+            display: none; /* Hidden by default */
+            padding: 40px;
+        }
+
+        .screen.active {
+            display: block;
+            animation: slideInFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Typography */
+        h1, h2, h3 { color: var(--text-main); margin-bottom: 20px; text-align: center; }
+        p { color: var(--text-muted); text-align: center; margin-bottom: 30px; }
+
+        /* Buttons */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(79, 70, 229, 0.3);
+        }
+        
+        .btn:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        .btn-primary:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .pulse-btn {
+            animation: pulseRetry 1.5s infinite;
+        }
+
+        /* Form Inputs */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .error-msg {
+            color: var(--danger);
+            font-size: 14px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: flex-end; /* Aligned logout to the right */
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* Level Selection Buttons */
+        .level-btn {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+        }
+
+        .level-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background-color: #f5f3ff;
+        }
+
+        .level-btn:disabled {
+            background-color: var(--locked-bg);
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        /* Quiz specific styles */
+        .progress-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background-color: var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        /* Shimmer effect for progress bar */
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .question-text {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            background-color: white;
+            border: 2px solid var(--border-color);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: left;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeUpOptions 0.4s ease forwards;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background-color: #f5f3ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        
+        .option-btn:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        /* Native Disabled Overrides to ensure colors aren't muted */
+        .option-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            color: inherit;
+        }
+
+        /* Instant Feedback Classes - Vibrant Solid Colors */
+        .option-btn.selected {
+            border-color: var(--primary);
+            background-color: #e0e7ff;
+        }
+        .option-btn.correct {
+            border-color: #059669 !important; /* Darker Green border */
+            background-color: var(--success) !important; /* Solid Green */
+            color: white !important;
+            opacity: 1 !important; /* Override disabled dimming */
+            animation: pop 0.4s ease forwards !important;
+        }
+        .option-btn.incorrect {
+            border-color: #dc2626 !important; /* Darker Red border */
+            background-color: var(--danger) !important; /* Solid Red */
+            color: white !important;
+            opacity: 1 !important; /* Override disabled dimming */
+            animation: shake 0.4s ease forwards !important;
+        }
+
+        /* Instant Explanation Box */
+        .instant-explanation {
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #e0e7ff;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #3730a3;
+            text-align: left;
+            display: none; /* Hidden until answer is selected */
+            animation: slideInFade 0.4s ease forwards;
+            border-left: 4px solid var(--primary);
+        }
+
+        /* Result Screen */
+        .score-display {
+            font-size: 48px;
+            font-weight: 700;
+            text-align: center;
+            color: var(--primary);
+            margin: 20px 0;
+            transition: transform 0.15s ease;
+        }
+
+        .performance-msg {
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        /* Review Section */
+        .review-section {
+            margin-top: 40px;
+            border-top: 2px solid var(--border-color);
+            padding-top: 30px;
+            max-height: 400px;
+            overflow-y: auto;
+            text-align: left;
+        }
+
+        .review-item {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 5px solid var(--border-color);
+        }
+
+        .review-item.correct-ans { border-left-color: var(--success); }
+        .review-item.wrong-ans { border-left-color: var(--danger); }
+
+        .review-q { font-weight: 600; margin-bottom: 10px; font-size: 16px; text-align: left; color: var(--text-main); }
+        .review-user, .review-correct { font-size: 14px; margin-bottom: 5px; text-align: left; }
+        .review-explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #e0e7ff;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #3730a3;
+            text-align: left;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .nav-buttons .btn { margin-bottom: 0; }
+
+        /* Floating Emoji Success Animation */
+        .floating-emoji {
+            position: fixed;
+            bottom: -50px;
+            z-index: 9999;
+            user-select: none;
+            pointer-events: none;
+            animation: floatUpAnim ease-out forwards;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .screen { padding: 20px; }
+            .nav-buttons { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- LOGIN SCREEN -->
+        <div id="login-screen" class="screen active">
+            <h1>Welcome to Quiz Pro</h1>
+            <p>Please log in to track your progress.</p>
+            
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <input type="text" id="username" class="form-input" placeholder="Username" autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password" class="form-input" placeholder="Password (min. 6 characters)" autocomplete="current-password">
+                </div>
+                <div id="login-error" class="error-msg"></div>
+                <button type="submit" class="btn btn-primary">Log In</button>
+            </form>
+        </div>
+
+        <!-- WELCOME SCREEN -->
+        <div id="welcome-screen" class="screen">
+            <div class="header-top">
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+            <!-- The heading will be dynamically populated with the username -->
+            <h1 id="welcome-title">Web Development Quiz</h1>
+            <p>Test your skills in HTML, CSS, and JavaScript. Complete a level to unlock the next!</p>
+            
+            <div class="levels-container">
+                <button class="btn level-btn" id="btn-easy" onclick="startQuiz('easy')">
+                    <span>🟢 Easy</span>
+                    <span class="status">Unlocked</span>
+                </button>
+                <button class="btn level-btn" id="btn-medium" disabled onclick="startQuiz('medium')">
+                    <span>🟡 Medium</span>
+                    <span class="status">Locked 🔒</span>
+                </button>
+                <button class="btn level-btn" id="btn-hard" disabled onclick="startQuiz('hard')">
+                    <span>🔴 Hard</span>
+                    <span class="status">Locked 🔒</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- QUIZ SCREEN -->
+        <div id="quiz-screen" class="screen">
+            <div class="progress-container">
+                <span id="level-indicator">Level: Easy</span>
+                <span id="question-tracker">Question 1/10</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-fill" id="progress-bar"></div>
+            </div>
+
+            <h2 class="question-text" id="question-text">Question goes here?</h2>
+            
+            <div class="options-grid" id="options-container">
+                <!-- Options injected via JS -->
+            </div>
+
+            <!-- Instant Explanation container directly under the options -->
+            <div id="instant-explanation" class="instant-explanation"></div>
+
+            <button class="btn btn-primary" id="btn-next" disabled onclick="nextQuestion()">Next Question</button>
+        </div>
+
+        <!-- RESULT SCREEN -->
+        <div id="result-screen" class="screen">
+            <h2>Level Complete!</h2>
+            <div class="score-display" id="final-score">0/10</div>
+            <div class="performance-msg" id="performance-msg">Good 👍</div>
+
+            <div class="nav-buttons">
+                <button class="btn" style="background: #e5e7eb; color: #374151;" onclick="goToHome()">🏠 Home</button>
+                <button class="btn btn-primary" id="btn-retry-level" onclick="retryLevel()">🔄 Retry Level</button>
+                <button class="btn btn-primary" id="btn-next-level" style="display: none; background: #10b981;" onclick="startNextLevel()">➡️ Next Level</button>
+            </div>
+
+            <div class="review-section" id="review-container">
+                <h3>Review Answers</h3>
+                <!-- Reviews injected via JS -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- QUIZ DATA ---
+        const quizData = {
+            easy: [
+                { q: "Which HTML tag is used to define a paragraph?", options: ["<p>", "<para>", "<pg>", "<text>"], answer: 0, explanation: "The <p> tag is the standard HTML element used to define a paragraph of text." },
+                { q: "Which tag is used to insert an image in HTML?", options: ["<pic>", "<image>", "<img>", "<src>"], answer: 2, explanation: "The <img> tag is used to embed an image. It requires a 'src' attribute to locate the image." },
+                { q: "What is the correct HTML tag for creating a hyperlink?", options: ["<link>", "<a>", "<href>", "<hyper>"], answer: 1, explanation: "The <a> (anchor) tag is used to create hyperlinks, with the 'href' attribute pointing to the destination." },
+                { q: "Which CSS property is used to change the text color?", options: ["text-color", "font-color", "color", "bgcolor"], answer: 2, explanation: "The 'color' property is used to set the color of the text in CSS." },
+                { q: "How do you add a background color in CSS?", options: ["background-color", "color-background", "bg-color", "background"], answer: 0, explanation: "The 'background-color' property sets the background color of an element." },
+                { q: "Which CSS property controls the text size?", options: ["text-size", "font-style", "text-style", "font-size"], answer: 3, explanation: "The 'font-size' property is used to determine the size of the text." },
+                { q: "Which keyword is used to declare a variable in JavaScript?", options: ["var", "let", "const", "All of the above"], answer: 3, explanation: "JavaScript supports 'var', 'let', and 'const' for variable declaration, depending on scope and mutability needs." },
+                { q: "How do you write 'Hello World' in an alert box?", options: ["msg('Hello World');", "alert('Hello World');", "msgBox('Hello World');", "console.log('Hello World');"], answer: 1, explanation: "The alert() function displays a dialog box with a specified message and an OK button." },
+                { q: "How do you create a single-line comment in JavaScript?", options: ["// comment", "<!-- comment -->", "/* comment */", "# comment"], answer: 0, explanation: "Two forward slashes (//) are used to write single-line comments in JavaScript." },
+                { q: "Which HTML tag is used for the largest heading?", options: ["<heading>", "<h6>", "<h1>", "<head>"], answer: 2, explanation: "HTML headings are defined with <h1> to <h6> tags, where <h1> defines the most important (and largest) heading." }
+            ],
+            medium: [
+                { q: "Which HTML5 element is used to define independent, self-contained content?", options: ["<section>", "<article>", "<aside>", "<div>"], answer: 1, explanation: "The <article> element specifies independent, self-contained content that should make sense on its own (e.g., a blog post)." },
+                { q: "Which semantic HTML tag is used for a group of navigation links?", options: ["<menu>", "<nav>", "<links>", "<header>"], answer: 1, explanation: "The <nav> element defines a set of navigation links." },
+                { q: "In CSS Flexbox, how do you center items horizontally along the main axis?", options: ["align-items: center;", "text-align: center;", "justify-content: center;", "align-content: center;"], answer: 2, explanation: "justify-content: center; aligns flex items at the center of the main axis (horizontal by default)." },
+                { q: "Which CSS Grid property defines the sizing of grid columns?", options: ["grid-template-rows", "grid-columns", "grid-template-columns", "grid-size"], answer: 2, explanation: "grid-template-columns defines the line names and track sizing functions of the grid columns." },
+                { q: "What is the default flex-direction in CSS Flexbox?", options: ["column", "row", "row-reverse", "column-reverse"], answer: 1, explanation: "By default, flex-direction is set to 'row', placing items horizontally from left to right." },
+                { q: "How do you find an HTML element with the id 'demo' in JavaScript?", options: ["document.getElementById('demo')", "document.getElementByName('demo')", "document.querySelector('.demo')", "document.getId('demo')"], answer: 0, explanation: "document.getElementById() returns the element that has the ID attribute with the specified value." },
+                { q: "Which event occurs when the user clicks on an HTML element?", options: ["onmouseover", "onchange", "onclick", "onmouseclick"], answer: 2, explanation: "The onclick event attributes fires when the user clicks on the element." },
+                { q: "How do you change the text content of an element in JavaScript?", options: ["element.value", "element.innerHTML", "element.textContent", "Both innerHTML and textContent"], answer: 3, explanation: "Both innerHTML and textContent can be used, though textContent is safer if you only need to update plain text (prevents XSS)." },
+                { q: "How do you add a CSS class 'active' to an element via JavaScript?", options: ["element.class = 'active'", "element.classList.add('active')", "element.className += 'active'", "Both B and C"], answer: 3, explanation: "classList.add() is the modern approach, but appending to className also works." },
+                { q: "What is the main difference between querySelector and getElementById?", options: ["No difference", "getElementById is faster but only selects by ID. querySelector uses CSS selectors.", "querySelector only selects IDs", "getElementById returns an array"], answer: 1, explanation: "getElementById is highly optimized for IDs only. querySelector is more flexible, allowing any CSS selector, but is slightly slower." }
+            ],
+            hard: [
+                { q: "What is a Closure in JavaScript?", options: ["A way to block script execution", "A function bundled with its lexical environment", "A method to close the browser window", "A CSS animation state"], answer: 1, explanation: "A closure gives a function access to its outer scope. In JS, closures are created every time a function is created, at function creation time." },
+                { q: "What object is used to handle asynchronous operations in modern JavaScript?", options: ["Callback", "Thread", "Promise", "Timeout"], answer: 2, explanation: "The Promise object represents the eventual completion (or failure) of an asynchronous operation and its resulting value." },
+                { q: "What is a callback function?", options: ["A function passed into another function as an argument", "A function that calls the server back", "A function that runs backwards", "An error handling function"], answer: 0, explanation: "A callback is a function passed as an argument to another function, which is then invoked inside the outer function to complete a routine." },
+                { q: "Which CSS position value removes the element entirely from the normal document flow?", options: ["relative", "static", "absolute", "sticky"], answer: 2, explanation: "Absolute positioning removes the element from the document flow, positioning it relative to its closest positioned ancestor." },
+                { q: "What does the CSS 'z-index' property control?", options: ["Zoom level", "Stacking order of elements", "Z-axis 3D rotation", "Font weight"], answer: 1, explanation: "z-index specifies the stack order of an element. Elements with higher stack orders are always in front of lower stack orders." },
+                { q: "Which CSS rule is used to create animations?", options: ["@keyframes", "@media", "@animate", "@transition"], answer: 0, explanation: "The @keyframes rule specifies the animation code. The animation is created by gradually changing from one set of CSS styles to another." },
+                { q: "How do you prevent a form from submitting the default way using JavaScript?", options: ["event.stop()", "event.preventDefault()", "form.pause()", "return false;"], answer: 1, explanation: "Calling event.preventDefault() inside the form submission event handler stops the browser's default behavior of reloading the page." },
+                { q: "How do you store a JavaScript object in localStorage?", options: ["localStorage.setItem('key', object)", "localStorage.setItem('key', JSON.stringify(object))", "localStorage.save(object)", "localStorage.push(object)"], answer: 1, explanation: "localStorage can only store strings. You must use JSON.stringify() to convert an object into a string before storing it." },
+                { q: "What does JSON.stringify() do?", options: ["Parses a JSON string into an object", "Converts a JS object into a JSON string", "Validates JSON syntax", "Encrypts JSON data"], answer: 1, explanation: "JSON.stringify() takes a JavaScript object or array and converts it into a valid JSON string." },
+                { q: "What does JSON.parse() do?", options: ["Converts a JSON string into a JS object", "Converts a JS object to a string", "Formats CSS", "Fetches data from an API"], answer: 0, explanation: "JSON.parse() takes a well-formed JSON string and constructs the JavaScript value or object described by the string." }
+            ]
+        };
+
+        // --- STATE VARIABLES ---
+        let currentLevel = 'easy';
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let userAnswers = []; // Store user's selected option indices
+        let isAnswerSubmitted = false;
+
+        // --- AUTHENTICATION LOGIC ---
+        function handleLogin(e) {
+            e.preventDefault();
+            const usernameInput = document.getElementById('username').value.trim();
+            const passwordInput = document.getElementById('password').value;
+            const errorDiv = document.getElementById('login-error');
+
+            // Validation
+            if (usernameInput === '' || passwordInput === '') {
+                errorDiv.innerText = 'Please fill in all fields.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            if (passwordInput.length < 6) {
+                errorDiv.innerText = 'Password must be at least 6 characters long.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            // Mock successful login
+            errorDiv.style.display = 'none';
+            localStorage.setItem('quiz_logged_in', 'true');
+            localStorage.setItem('quiz_username', usernameInput);
+            
+            // Reset progression on new login to default state
+            localStorage.setItem('quiz_unlocked_level', 'easy');
+            
+            // Clear inputs
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+
+            initApp();
+        }
+
+        function logout() {
+            localStorage.removeItem('quiz_logged_in');
+            localStorage.removeItem('quiz_unlocked_level');
+            localStorage.removeItem('quiz_username');
+            switchScreen('login-screen');
+        }
+
+        // --- INITIALIZATION & LOCAL STORAGE ---
+        // Retrieve unlocked level from local storage, default to 'easy'
+        function getUnlockedLevel() {
+            return localStorage.getItem('quiz_unlocked_level') || 'easy';
+        }
+
+        // Extracted Lock Update function so it can be called without forcing a screen switch
+        function updateLocksUI() {
+            const unlocked = getUnlockedLevel();
+            
+            const btnMedium = document.getElementById('btn-medium');
+            const btnHard = document.getElementById('btn-hard');
+
+            // Reset buttons to locked state first (crucial if switching users without refreshing)
+            btnMedium.disabled = true;
+            btnMedium.querySelector('.status').innerText = 'Locked 🔒';
+            btnHard.disabled = true;
+            btnHard.querySelector('.status').innerText = 'Locked 🔒';
+
+            if (unlocked === 'medium' || unlocked === 'hard') {
+                btnMedium.disabled = false;
+                btnMedium.querySelector('.status').innerText = 'Unlocked';
+            }
+            if (unlocked === 'hard') {
+                btnHard.disabled = false;
+                btnHard.querySelector('.status').innerText = 'Unlocked';
+            }
+        }
+
+        // Update UI based on unlocked levels
+        function initApp() {
+            const isLoggedIn = localStorage.getItem('quiz_logged_in') === 'true';
+            
+            if (!isLoggedIn) {
+                switchScreen('login-screen');
+                return;
+            }
+
+            // Set welcome message dynamically as the main heading
+            const savedUsername = localStorage.getItem('quiz_username') || 'User';
+            document.getElementById('welcome-title').innerText = `👋 Welcome, ${savedUsername}!`;
+
+            updateLocksUI();
+            switchScreen('welcome-screen');
+        }
+
+        // Save progress if they pass the level
+        function saveProgress(completedLevel) {
+            const currentUnlocked = getUnlockedLevel();
+            if (completedLevel === 'easy' && currentUnlocked === 'easy') {
+                localStorage.setItem('quiz_unlocked_level', 'medium');
+            } else if (completedLevel === 'medium' && (currentUnlocked === 'easy' || currentUnlocked === 'medium')) {
+                localStorage.setItem('quiz_unlocked_level', 'hard');
+            }
+            updateLocksUI(); // Refresh locks in background!
+        }
+
+        // --- NAVIGATION LOGIC ---
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function goToHome() {
+            updateLocksUI();
+            switchScreen('welcome-screen');
+        }
+
+        function startQuiz(level) {
+            currentLevel = level;
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = [];
+            
+            document.getElementById('level-indicator').innerText = `Level: ${level.charAt(0).toUpperCase() + level.slice(1)}`;
+            switchScreen('quiz-screen');
+            loadQuestion();
+        }
+
+        function retryLevel() {
+            startQuiz(currentLevel);
+        }
+
+        function startNextLevel() {
+            if (currentLevel === 'easy') startQuiz('medium');
+            else if (currentLevel === 'medium') startQuiz('hard');
+        }
+
+        // --- SUCCESS ANIMATION ---
+        function triggerSuccessAnimation() {
+            const emojis = ['🎉', '✨', '🏆', '🌟', '🎊', '🚀', '💯'];
+            const container = document.body;
+            
+            for (let i = 0; i < 45; i++) {
+                setTimeout(() => {
+                    const emojiDiv = document.createElement('div');
+                    emojiDiv.classList.add('floating-emoji');
+                    emojiDiv.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                    emojiDiv.style.left = Math.random() * 100 + 'vw';
+                    emojiDiv.style.fontSize = Math.random() * 20 + 24 + 'px';
+                    emojiDiv.style.animationDuration = Math.random() * 2 + 2 + 's';
+                    
+                    container.appendChild(emojiDiv);
+                    
+                    // Cleanup element after animation completes
+                    setTimeout(() => emojiDiv.remove(), 4000);
+                }, i * 50); // Stagger the rendering
+            }
+        }
+
+        // --- QUIZ LOGIC ---
+        function loadQuestion() {
+            isAnswerSubmitted = false;
+            const qData = quizData[currentLevel][currentQuestionIndex];
+            
+            // Update Headers & Progress
+            document.getElementById('question-tracker').innerText = `Question ${currentQuestionIndex + 1}/10`;
+            document.getElementById('progress-bar').style.width = `${((currentQuestionIndex) / 10) * 100}%`;
+            
+            // Inject Text
+            document.getElementById('question-text').innerText = qData.q;
+            
+            // Hide instant explanation block when loading a new question
+            const explanationBox = document.getElementById('instant-explanation');
+            explanationBox.style.display = 'none';
+            explanationBox.innerHTML = '';
+            
+            // Inject Options
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = ''; // Clear old
+
+            qData.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.classList.add('option-btn');
+                btn.innerText = opt;
+                btn.style.animationDelay = `${index * 0.1}s`; // Staggered entry
+                btn.onclick = () => selectOption(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Reset Next Button
+            const nextBtn = document.getElementById('btn-next');
+            nextBtn.disabled = true;
+            nextBtn.innerText = currentQuestionIndex === 9 ? "Finish Quiz" : "Next Question";
+        }
+
+        function selectOption(selectedIndex, btnElement) {
+            if (isAnswerSubmitted) return; // Prevent changing answer after instant feedback
+            
+            isAnswerSubmitted = true;
+            userAnswers[currentQuestionIndex] = selectedIndex;
+            
+            const qData = quizData[currentLevel][currentQuestionIndex];
+            const isCorrect = (selectedIndex === qData.answer);
+            
+            if (isCorrect) score++;
+
+            // Apply Instant Feedback UI
+            const allOptions = document.querySelectorAll('.option-btn');
+            allOptions.forEach((btn, idx) => {
+                btn.disabled = true; // disable all clicks
+                
+                // Clear the entry animation to allow the CSS color feedback to render immediately without conflict
+                btn.style.animation = 'none'; 
+                void btn.offsetWidth; // Force a reflow so the browser resets the CSS states
+                
+                if (idx === qData.answer) {
+                    btn.classList.add('correct'); // highlight correct answer (Solid Green)
+                } else if (idx === selectedIndex && !isCorrect) {
+                    btn.classList.add('incorrect'); // highlight wrong answer if picked (Solid Red)
+                }
+            });
+            
+            // Display explanation instantly
+            const explanationBox = document.getElementById('instant-explanation');
+            explanationBox.innerHTML = `<strong>Explanation:</strong> ${qData.explanation}`;
+            explanationBox.style.display = 'block';
+
+            // Enable Next Button
+            document.getElementById('btn-next').disabled = false;
+            
+            // Optional: Small progress bar bump on selection
+            document.getElementById('progress-bar').style.width = `${((currentQuestionIndex + 1) / 10) * 100}%`;
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < 9) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        // --- RESULTS & REVIEW LOGIC ---
+        function finishQuiz() {
+            switchScreen('result-screen');
+            
+            // Populate Score with Animation
+            const scoreDisplay = document.getElementById('final-score');
+            scoreDisplay.innerText = `0/10`;
+            let currentDisplayScore = 0;
+            
+            if (score > 0) {
+                const scoreInterval = setInterval(() => {
+                    currentDisplayScore++;
+                    scoreDisplay.innerText = `${currentDisplayScore}/10`;
+                    scoreDisplay.style.transform = "scale(1.15)";
+                    setTimeout(() => scoreDisplay.style.transform = "scale(1)", 150);
+                    
+                    if (currentDisplayScore >= score) {
+                        clearInterval(scoreInterval);
+                    }
+                }, 150);
+            }
+            
+            const perfMsg = document.getElementById('performance-msg');
+            const nextLevelBtn = document.getElementById('btn-next-level');
+            const retryBtn = document.getElementById('btn-retry-level');
+            
+            nextLevelBtn.style.display = 'none';
+            retryBtn.classList.remove('pulse-btn');
+
+            if (score >= 9) {
+                perfMsg.innerText = "Excellent 🎉";
+            } else if (score >= 7) {
+                perfMsg.innerText = "Good 👍";
+            } else {
+                perfMsg.innerText = "Try Again 😅 (Score 7/10 to unlock next level)";
+                retryBtn.classList.add('pulse-btn'); // Emphasize Retry button via animation
+            }
+
+            // Handle Progression & Success Animation
+            if (score >= 7) {
+                saveProgress(currentLevel);
+                triggerSuccessAnimation();
+                if (currentLevel !== 'hard') {
+                    nextLevelBtn.style.display = 'block';
+                }
+            }
+
+            generateReview();
+        }
+
+        function generateReview() {
+            const container = document.getElementById('review-container');
+            // Keep the heading, remove old items
+            container.innerHTML = '<h3>Review Answers</h3>';
+            
+            const levelData = quizData[currentLevel];
+
+            levelData.forEach((q, idx) => {
+                const userChoiceIdx = userAnswers[idx];
+                const isCorrect = (userChoiceIdx === q.answer);
+                
+                const userChoiceText = userChoiceIdx !== undefined ? q.options[userChoiceIdx] : "No Answer";
+                const icon = isCorrect ? "✅" : "❌";
+                const wrapperClass = isCorrect ? "correct-ans" : "wrong-ans";
+
+                const reviewHtml = `
+                    <div class="review-item ${wrapperClass}">
+                        <div class="review-q">Q${idx + 1}: ${q.q}</div>
+                        <div class="review-user"><strong>Your Answer:</strong> ${userChoiceText} ${icon}</div>
+                        ${!isCorrect ? `<div class="review-correct"><strong>Correct Answer:</strong> ${q.options[q.answer]}</div>` : ""}
+                        <div class="review-explanation">
+                            <strong>Explanation:</strong> ${q.explanation}
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', reviewHtml);
+            });
+        }
+
+        // Run Init on Load
+        window.onload = initApp;
+
+    </script>
+</body>
+</html>
