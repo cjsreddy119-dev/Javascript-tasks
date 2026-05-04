@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptous | Modern Cryptocurrency Platform</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+       
+    </style>
+</head>
+<body>
+
+    <div class="section-dark">
+        <header>
+            <div class="container navbar">
+                <a href="#" class="logo">
+                    <!-- <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12" stroke="#ff5a5a" stroke-width="3" stroke-linecap="round"/>
+                        <circle cx="12" cy="12" r="4" fill="#ff5a5a"/>
+                    </svg> -->
+                    <img src="logo_no_bg.png" alt="" height="50" width="50">
+                    Cryptous
+                </a>
+                <nav class="nav-links">
+                    <a href="#" class="highlight">Home</a>
+                    <a href="#">Company</a>
+                    <a href="#">About</a>
+                    <a href="#">Pricing</a>
+                    <a href="#">Team</a>
+                    <a href="#">Contact</a>
+                    <a href="#">Blog</a>
+                </nav>
+                <a href="#" class="btn btn-outline">Trade Now</a>
+            </div>
+        </header>
+
+        <section class="container hero">
+            <div class="hero-content">
+                <h1 class="hero-title">Make better business<br>with Cryptocurrency</h1>
+                <p class="hero-desc">We offer users a fully operational long-term rental platform. It leverages blockchain technology.</p>
+                <a href="#" class="btn btn-primary">Get Whitelisted</a>
+            </div>
+            <div class="hero-image">
+                <img src="img1.png" alt="Hero Crypto Graph" width="100%">
+            </div>
+        </section>
+
+        <div class="hero-indicator">
+            <span></span>
+        </div>
+
+        <section class="container prices-section">
+            <h2 class="section-title-dark">Today's Cryptocurrency Prices</h2>
+            <div class="crypto-prices">
+                <table class="crypto-table">
+                    <thead>
+                        <tr>
+                            <th class="col-id">#</th>
+                            <th>NAME</th>
+                            <th>PRICE</th>
+                            <th>24H %</th>
+                            <th>7D %</th>
+                            <th>MARKET CAP</th>
+                            <th>VOLUME(24H)</th>
+                            <th>LAST 7 DAYS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="col-id">1</td>
+                            <td>
+                                <div class="coin-name">
+                                    <div class="coin-icon" style="background: #f7931a;">₿</div>
+                                    Bitcoin <span class="coin-symbol">BTC</span>
+                                </div>
+                            </td>
+                            <td>$50,205.67</td>
+                            <td class="text-positive">▲ 3.52%</td>
+                            <td class="text-positive">▲ 15.34%</td>
+                            <td>$1.04T</td>
+                            <td>$38.5B</td>
+                            <td><svg class="sparkline"><polyline points="0,20 20,15 40,25 60,10 80,5" stroke="var(--positive)"/></svg></td>
+                        </tr>
+                        <tr>
+                            <td class="col-id">2</td>
+                            <td>
+                                <div class="coin-name">
+                                    <div class="coin-icon" style="background: #627eea;">Ξ</div>
+                                    Ethereum <span class="coin-symbol">ETH</span>
+                                </div>
+                            </td>
+                            <td>$3,503.27</td>
+                            <td class="text-negative">▼ 3.45%</td>
+                            <td class="text-positive">▲ 8.12%</td>
+                            <td>$432.5B</td>
+                            <td>$21.3B</td>
+                            <td><svg class="sparkline"><polyline points="0,5 20,15 40,10 60,25 80,20" stroke="var(--negative)"/></svg></td>
+                        </tr>
+                        <tr>
+                            <td class="col-id">3</td>
+                            <td>
+                                <div class="coin-name">
+                                    <div class="coin-icon" style="background: #0033ad;">₳</div>
+                                    Cardano <span class="coin-symbol">ADA</span>
+                                </div>
+                            </td>
+                            <td>$2.15</td>
+                            <td class="text-negative"><span class="trend-icon">▼</span>1.12%</td>
+                            <td class="text-negative"><span class="trend-icon">▼</span>4.35%</td>
+                            <td>$65,589,825,545</td>
+                            <td>$33,452 ADA</td>
+                            <td><svg class="sparkline"><polyline points="0,10 20,15 40,25 60,20 80,25" stroke="var(--negative)"/></svg></td>
+                        </tr>
+                        <tr>
+                            <td class="col-id">4</td>
+                            <td>
+                                <div class="coin-name">
+                                    <div class="coin-icon" style="background: #26a17b;">₮</div>
+                                    Tether <span class="coin-symbol">USDT</span>
+                                </div>
+                            </td>
+                            <td>$1.00</td>
+                            <td class="text-positive"><span class="trend-icon">▲</span>0.01%</td>
+                            <td class="text-positive"><span class="trend-icon">▲</span>0.10%</td>
+                            <td>$48,605,824,345</td>
+                            <td>$28,452 USDT</td>
+                            <td><svg class="sparkline"><polyline points="0,15 20,14 40,15 60,16 80,15" stroke="var(--positive)"/></svg></td>
+                        </tr>
+                        <tr>
+                            <td class="col-id">5</td>
+                            <td>
+                                <div class="coin-name">
+                                    <div class="coin-icon" style="background: #e84142;">A</div>
+                                    Avalanche <span class="coin-symbol">AVAX</span>
+                                </div>
+                            </td>
+                            <td>$55.23</td>
+                            <td class="text-negative"><span class="trend-icon">▼</span>3.52%</td>
+                            <td class="text-positive"><span class="trend-icon">▲</span>3.21%</td>
+                            <td>$25,605,824,345</td>
+                            <td>$12,452 AVAX</td>
+                            <td><svg class="sparkline"><polyline points="0,25 20,20 40,15 60,10 80,5" stroke="var(--positive)"/></svg></td>
+                        </tr>
+                        <tr>
+                            <td class="col-id">6</td>
+                            <td>
+                                <div class="coin-name">
+                                    <div class="coin-icon" style="background: #000000; color: white;">A</div>
+                                    Algorand <span class="coin-symbol">ALGO</span>
+                                </div>
+                            </td>
+                            <td>$1.02</td>
+                            <td class="text-positive"><span class="trend-icon">▲</span>2.14%</td>
+                            <td class="text-negative"><span class="trend-icon">▼</span>5.10%</td>
+                            <td>$8,605,824,345</td>
+                            <td>$9,452 ALGO</td>
+                            <td><svg class="sparkline"><polyline points="0,5 20,10 40,15 60,20 80,25" stroke="var(--negative)"/></svg></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <section class="features-section section-light">
+        <div class="container">
+            <h2 class="section-title-light">The most trusted cryptocurrency platform</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><img src="removed_bg_1.png" alt="Trade" width="40" height="40"></div>
+                    <h3 class="feature-title">Ease of Trading</h3>
+                    <p class="feature-desc">Intuitive interface, instant deposits, and direct bank cashouts.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><img src="removed_bg_2.png" alt="Security" width="40" height="40"></div>
+                    <h3 class="feature-title">Institutional Security</h3>
+                    <p class="feature-desc">98% of assets stored offline with highly encrypted personal data.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><img src="removed_bg_3.png" alt="Reliable" width="40" height="40"></div>
+                    <h3 class="feature-title">Proven Reliability</h3>
+                    <p class="feature-desc">Exchanging since 2011 with industry-leading uptime and 24/7 support.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="app-download section-dark">
+        <div class="container app-container">
+            <div class="app-content">
+                <h2 class="app-title">Try the future, today.<br>Download Crypto</h2>
+                <p class="app-desc">Stay connected to the market with our mobile app. Featuring advanced order types and analytical tools for experienced traders.</p>
+                <div class="store-buttons">
+                    <a href="#" class="store-btn">
+                        <svg width="140" height="42"><rect width="140" height="42" rx="6" fill="white"/><text x="15" y="25" fill="black" font-weight="bold">App Store</text></svg>
+                    </a>
+                    <a href="#" class="store-btn">
+                        <svg width="140" height="42"><rect width="140" height="42" rx="6" fill="white"/><text x="15" y="25" fill="black" font-weight="bold">Google Play</text></svg>
+                    </a>
+                </div>
+            </div>
+            <div class="app-mockups">
+               <img src="mbl.png" alt="Mobile App View">
+            </div>
+        </div>
+    </section>
+
+    <section class="blog-section section-light">
+        <div class="container">
+            <h2 class="section-title-light">Learn to thrive</h2>
+            <div class="blog-grid">
+                <div class="blog-card">
+                    <div class="blog-image"><img src="ss1.jpeg" alt="Blog 1"></div>
+                    <div class="blog-content">
+                        <h3 class="blog-title">New Leveraged Pairs Added</h3>
+                        <p class="blog-desc">Adopt good cybersecurity habits and use unique passwords...</p>
+                        <div class="blog-meta">By: Amelia Perez | 15/07/2021</div>
+                    </div>
+                </div>
+                <div class="blog-card">
+                    <div class="blog-image"><img src="ss2.jpeg" alt="Blog 2"></div>
+                    <div class="blog-content">
+                        <h3 class="blog-title">Understanding Bitcoin</h3>
+                        <p class="blog-desc">Learn how Bitcoin works and why it's reshaping the industry...</p>
+                        <div class="blog-meta">By: John Smith | 12/07/2021</div>
+                    </div>
+                </div>
+                <div class="blog-card">
+                    <div class="blog-image"><img src="ss3.jpeg" alt="Blog 3"></div>
+                    <div class="blog-content">
+                        <h3 class="blog-title">Future of Crypto</h3>
+                        <p class="blog-desc">Potential of blockchain for global trade and finance...</p>
+                        <div class="blog-meta">By: Sarah Lee | 10/07/2021</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-dark">
+        <section class="newsletter container">
+            <h2>Never miss a drop</h2>
+            <p>Subscribe for the latest news, drops & collectibles</p>
+            <form class="subscribe-form" onsubmit="event.preventDefault();">
+                <input type="email" class="subscribe-input" placeholder="Enter your email" required>
+                <button type="submit" class="btn btn-primary">Subscribe</button>
+            </form>
+        </section>
+
+        <footer class="footer container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Businesses</h4>
+                    <ul>
+                        <li><a href="#">Prime</a></li>
+                        <li><a href="#">Custody</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Exchange</h4>
+                    <ul>
+                        <li><a href="#">Margin Trading</a></li>
+                        <li><a href="#">Demo</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Blockchain</h4>
+                    <ul>
+                        <li><a href="#">Chain Explorer</a></li>
+                        <li><a href="#">Security</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Prices</a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+</body>
+</html>
