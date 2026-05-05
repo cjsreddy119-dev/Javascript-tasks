@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reddy Cart - Next Gen Shopping</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Plus Jakarta Sans for a highly modern, clean, geometric aesthetic -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #f8fafc; 
+            color: #0f172a;
+        }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        .toast-enter { animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .toast-leave { animation: slideOut 0.3s ease-in forwards; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+        
+        .view-section { display: none; animation: fadeIn 0.5s ease-out forwards; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        
+        @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.35); } 100% { transform: scale(1); } }
+        .animate-pop { animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        /* Custom Theme Elements */
+        .btn-gradient {
+            background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+            color: #ffffff;
+            transition: all 0.3s ease;
+            background-size: 200% 200%;
+        }
+        .btn-gradient:hover {
+            background-position: right bottom;
+            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
+            transform: translateY(-2px);
+        }
+        .btn-gradient:disabled { background: #cbd5e1; box-shadow: none; transform: none; cursor: not-allowed; }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .input-aura {
+            width: 100%;
+            padding: 14px 20px;
+            background-color: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #0f172a;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        .input-aura:focus { border-color: #4f46e5; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+
+        .nav-link {
+            color: #475569;
+            font-weight: 600;
+            font-size: 14px;
+            transition: color 0.3s;
+            position: relative;
+            padding: 8px 0;
+        }
+        .nav-link:hover { color: #4f46e5; }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, #4f46e5, #06b6d4);
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after { width: 100%; }
+        
+        .product-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .product-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px -10px rgba(79, 70, 229, 0.15); }
+
+        /* Price Range Accent */
+        .aura-slider { accent-color: #4f46e5; height: 6px; border-radius: 10px; }
+
+        /* Payment Option Active State */
+        .payment-label input:checked + div + div + .payment-card { border-color: #4f46e5; background-color: rgba(79, 70, 229, 0.05); }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- TOP PROMO -->
+    <!-- <div class="bg-slate-900 text-indigo-100 text-xs sm:text-sm py-2.5 text-center font-semibold tracking-wide">
+        Elevate your lifestyle. Use code <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400 font-extrabold mx-1">REDDY20</span> for 20% off.
+    </div> -->
+
+    <!-- NAVIGATION BAR -->
+    <nav class="glass-card shadow-sm sticky top-0 z-50 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                
+                <!-- REDDY CART LOGO -->
+                <div class="flex-shrink-0 flex items-center group cursor-pointer" onclick="navigate('home')">
+                    <div class="w-10 h-10 bg-gradient-to-tr from-indigo-600 to-cyan-400 rounded-xl flex items-center justify-center text-white mr-3 shadow-lg shadow-indigo-500/30 group-hover:rotate-6 transition-all duration-300">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 13v6M10.5 13h2.5a1.5 1.5 0 010 3h-2.5M12 16l2 3"></path>
+                        </svg>
+                    </div>
+                    <span class="font-extrabold text-2xl tracking-tight text-slate-900">REDDY<span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-cyan-500">CART</span></span>
+                </div>
+
+                <!-- Desktop Links -->
+                <div class="hidden md:flex items-center space-x-10 ml-10">
+                    <button onclick="navigate('home')" class="nav-link">Home</button>
+                    <button onclick="navigate('products', 'all')" class="nav-link">Products</button>
+                    <button onclick="navigate('contact')" class="nav-link">Contact Us</button>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="hidden sm:flex flex-1 max-w-md mx-8 relative group">
+                    <input type="text" id="searchInput" placeholder="Search the extraordinary..." 
+                        class="w-full pl-12 pr-4 py-3 bg-slate-100/50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-indigo-100 focus:ring-4 focus:ring-indigo-50 text-sm text-slate-800 outline-none transition-all placeholder-slate-400 font-medium">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors"></i>
+                </div>
+
+                <!-- Nav Icons -->
+                <div class="flex items-center space-x-3 sm:space-x-4">
+                    <button onclick="handleAuthClick()" class="flex flex-col items-center justify-center w-12 h-12 rounded-2xl text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-all">
+                        <i class="fa-regular fa-user text-[18px] mb-0.5"></i>
+                        <span class="text-[9px] font-bold uppercase tracking-wider signin-btn-text">Profile</span>
+                    </button>
+                    <button onclick="navigate('cart')" class="relative flex flex-col items-center justify-center w-12 h-12 rounded-2xl text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-all">
+                        <i class="fa-solid fa-bag-shopping text-[18px] mb-0.5"></i>
+                        <span class="text-[9px] font-bold uppercase tracking-wider">Bag</span>
+                        <span id="cartBadge" class="absolute top-1 right-1 bg-gradient-to-r from-indigo-600 to-cyan-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center hidden shadow-sm border border-white">0</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Search Bar -->
+            <div class="sm:hidden pb-4 px-4 pt-1">
+                <div class="relative">
+                    <input type="text" id="mobileSearchInput" placeholder="Search the extraordinary..." 
+                        class="w-full pl-10 pr-4 py-3 bg-slate-100 border-2 border-transparent rounded-xl text-sm font-medium text-slate-800 outline-none placeholder-slate-400 focus:border-indigo-200">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                </div>
+                <div class="flex justify-between mt-4 px-6 text-xs font-bold text-slate-500">
+                    <button onclick="navigate('home')" class="hover:text-indigo-600">HOME</button>
+                    <button onclick="navigate('products', 'all')" class="hover:text-indigo-600">PRODUCTS</button>
+                    <button onclick="navigate('contact')" class="hover:text-indigo-600">CONTACT US</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+        <!-- 1. HOME VIEW -->
+        <div id="home-view" class="view-section active">
+            <!-- Hero Banner -->
+            <div class="w-full rounded-[2rem] bg-slate-900 mb-16 flex flex-col md:flex-row items-center justify-between cursor-pointer overflow-hidden relative shadow-2xl" onclick="navigate('products', 'all')">
+                <div class="absolute inset-0 z-0 opacity-40">
+                    <div class="absolute top-[-20%] left-[-10%] w-96 h-96 bg-indigo-600 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
+                    <div class="absolute bottom-[-20%] right-[-10%] w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
+                </div>
+                <div class="p-10 md:p-20 flex-1 text-center md:text-left z-10">
+                    <span class="inline-block py-1.5 px-4 rounded-full bg-white/10 backdrop-blur-md text-white border border-white/20 text-xs font-bold tracking-widest mb-6">NEW COLLECTION</span>
+                    <h1 class="text-5xl sm:text-7xl font-extrabold text-white leading-[1.1] mb-6 tracking-tight">Step into the <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400">Future.</span></h1>
+                    <p class="text-slate-300 text-lg mb-10 max-w-md mx-auto md:mx-0 font-medium">Curated tech and fashion for the modern visionary. Experience next-level shopping.</p>
+                    <button class="btn-gradient px-8 py-4 rounded-2xl font-bold text-base shadow-lg shadow-indigo-500/30 flex items-center mx-auto md:mx-0">
+                        Explore Catalog <i class="fa-solid fa-arrow-right ml-3"></i>
+                    </button>
+                </div>
+                <div class="w-full md:w-5/12 h-[300px] md:h-[500px] z-10 relative">
+                    <img src="https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=800&q=80" alt="Hero" class="w-full h-full object-cover rounded-tl-[4rem] md:rounded-tl-[6rem]">
+                </div>
+            </div>
+
+            <!-- Categories Banner -->
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Shop by Category</h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 mb-16">
+                <div class="relative h-72 rounded-3xl cursor-pointer overflow-hidden group shadow-sm hover:shadow-xl transition-all" onclick="navigate('products', 'fashion')">
+                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent flex flex-col justify-end p-8">
+                        <h3 class="text-white text-2xl font-extrabold tracking-wide mb-1">Apparel</h3>
+                        <p class="text-slate-200 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">View Collection <i class="fa-solid fa-chevron-right text-xs ml-1"></i></p>
+                    </div>
+                </div>
+                <div class="relative h-72 rounded-3xl cursor-pointer overflow-hidden group shadow-sm hover:shadow-xl transition-all" onclick="navigate('products', 'electronics')">
+                    <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                    <div class="absolute inset-0 bg-gradient-to-t from-indigo-900/80 via-indigo-900/20 to-transparent flex flex-col justify-end p-8">
+                        <h3 class="text-white text-2xl font-extrabold tracking-wide mb-1">Technology</h3>
+                        <p class="text-indigo-200 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">View Collection <i class="fa-solid fa-chevron-right text-xs ml-1"></i></p>
+                    </div>
+                </div>
+                <div class="relative h-72 rounded-3xl cursor-pointer overflow-hidden group shadow-sm hover:shadow-xl transition-all" onclick="navigate('products', 'accessories')">
+                    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                    <div class="absolute inset-0 bg-gradient-to-t from-cyan-900/80 via-cyan-900/20 to-transparent flex flex-col justify-end p-8">
+                        <h3 class="text-white text-2xl font-extrabold tracking-wide mb-1">Accessories</h3>
+                        <p class="text-cyan-200 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">View Collection <i class="fa-solid fa-chevron-right text-xs ml-1"></i></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Products -->
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Curated For You</h2>
+                    <p class="text-slate-500 mt-1 font-medium">Handpicked selections to elevate your game.</p>
+                </div>
+                <button onclick="navigate('products', 'all')" class="text-indigo-600 font-bold text-sm bg-indigo-50 px-5 py-2.5 rounded-xl hover:bg-indigo-100 transition-colors">View All</button>
+            </div>
+            <div id="featured-products-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- 2. PRODUCT LISTING VIEW -->
+        <div id="products-view" class="view-section">
+            
+            <div class="flex flex-col mb-8 bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-100">
+                <nav class="flex text-xs text-slate-400 font-bold tracking-wide uppercase mb-2">
+                    <button onclick="navigate('home')" class="hover:text-indigo-600 transition-colors">Home</button>
+                    <span class="mx-2">/</span>
+                    <span class="text-slate-800" id="breadcrumb-category">All Products</span>
+                </nav>
+                <div class="flex justify-between items-end">
+                    <h2 id="listing-title" class="text-3xl font-extrabold text-slate-900 tracking-tight">The Catalog</h2>
+                    <span class="text-sm text-slate-500 font-semibold bg-slate-100 px-3 py-1 rounded-lg" id="listing-count">0 items</span>
+                </div>
+            </div>
+            
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Sidebar Filters -->
+                <div class="w-full lg:w-72 flex-shrink-0 hidden lg:block">
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 mb-6">
+                        <h3 class="font-extrabold text-slate-900 tracking-wide mb-5 text-lg">Filters</h3>
+                        
+                        <div class="mb-8">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Categories</p>
+                            <div class="space-y-2">
+                                <label class="flex items-center p-3 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors group">
+                                    <input type="radio" name="cat" value="all" checked onchange="filterCategory('all')" class="w-4 h-4 text-indigo-600 focus:ring-indigo-600 accent-indigo-600">
+                                    <span class="ml-3 text-sm font-bold text-slate-700 group-hover:text-indigo-600">All Products</span>
+                                </label>
+                                <label class="flex items-center p-3 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors group">
+                                    <input type="radio" name="cat" value="fashion" onchange="filterCategory('fashion')" class="w-4 h-4 text-indigo-600 focus:ring-indigo-600 accent-indigo-600">
+                                    <span class="ml-3 text-sm font-bold text-slate-700 group-hover:text-indigo-600">Apparel</span>
+                                </label>
+                                <label class="flex items-center p-3 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors group">
+                                    <input type="radio" name="cat" value="electronics" onchange="filterCategory('electronics')" class="w-4 h-4 text-indigo-600 focus:ring-indigo-600 accent-indigo-600">
+                                    <span class="ml-3 text-sm font-bold text-slate-700 group-hover:text-indigo-600">Technology</span>
+                                </label>
+                                <label class="flex items-center p-3 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors group">
+                                    <input type="radio" name="cat" value="accessories" onchange="filterCategory('accessories')" class="w-4 h-4 text-indigo-600 focus:ring-indigo-600 accent-indigo-600">
+                                    <span class="ml-3 text-sm font-bold text-slate-700 group-hover:text-indigo-600">Accessories</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Max Budget</p>
+                            <div class="px-2">
+                                <input type="range" id="desktop-price-slider" min="0" max="100000" step="500" value="100000" class="w-full aura-slider cursor-pointer" oninput="updatePriceLabel(this.value); filterByPrice(this.value)">
+                                <div class="flex justify-between text-xs text-slate-500 mt-4 font-bold bg-slate-50 py-2 px-3 rounded-lg border border-slate-100">
+                                    <span>₹0</span>
+                                    <span id="desktop-price-label" class="text-indigo-600">₹100,000</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile Filter Pills -->
+                <div class="lg:hidden flex flex-col mb-6 bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                    <div class="flex space-x-3 overflow-x-auto no-scrollbar pb-3 mb-2 border-b border-slate-100">
+                        <button onclick="filterCategory('all'); updateMobileFilter('all')" id="m-filter-all" class="px-5 py-2 rounded-xl bg-indigo-600 text-white text-sm font-bold whitespace-nowrap shadow-md shadow-indigo-500/20">All</button>
+                        <button onclick="filterCategory('fashion'); updateMobileFilter('fashion')" id="m-filter-fashion" class="px-5 py-2 rounded-xl bg-slate-50 text-slate-600 text-sm font-bold whitespace-nowrap border border-slate-200">Apparel</button>
+                        <button onclick="filterCategory('electronics'); updateMobileFilter('electronics')" id="m-filter-electronics" class="px-5 py-2 rounded-xl bg-slate-50 text-slate-600 text-sm font-bold whitespace-nowrap border border-slate-200">Tech</button>
+                        <button onclick="filterCategory('accessories'); updateMobileFilter('accessories')" id="m-filter-accessories" class="px-5 py-2 rounded-xl bg-slate-50 text-slate-600 text-sm font-bold whitespace-nowrap border border-slate-200">Accessories</button>
+                    </div>
+                    <div class="pt-2 flex items-center space-x-4">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">Max:</span>
+                        <input type="range" id="mobile-price-slider" min="0" max="100000" step="500" value="100000" class="flex-1 aura-slider cursor-pointer" oninput="updatePriceLabel(this.value); filterByPrice(this.value)">
+                        <span id="mobile-price-label" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded">₹100,000</span>
+                    </div>
+                </div>
+
+                <!-- Product Grid -->
+                <div class="flex-grow">
+                    <div id="all-products-container" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
+                        <!-- Injected via JS -->
+                    </div>
+                    
+                    <div id="no-products-msg" class="hidden text-center py-24 bg-white rounded-3xl border border-slate-100 shadow-sm mt-4">
+                        <div class="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-5 rotate-12">
+                            <i class="fa-solid fa-ghost text-4xl text-slate-300"></i>
+                        </div>
+                        <h3 class="text-xl font-extrabold text-slate-800 mb-2">No items found</h3>
+                        <p class="text-sm text-slate-500 mb-6 max-w-xs mx-auto">We couldn't find anything matching your current filters or budget.</p>
+                        <button onclick="filterCategory('all'); document.getElementById('desktop-price-slider').value = 100000; updatePriceLabel(100000); filterByPrice(100000);" class="bg-slate-900 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-md hover:bg-slate-800 transition-colors">Reset Filters</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. PRODUCT DETAILS VIEW -->
+        <div id="detail-view" class="view-section">
+            <button onclick="navigate('products', 'all')" class="text-slate-500 hover:text-indigo-600 text-sm font-bold mb-6 flex items-center transition-colors"><i class="fa-solid fa-arrow-left mr-2 bg-white p-2 rounded-full shadow-sm"></i> Back to Catalog</button>
+            
+            <div id="product-detail-container" class="bg-white rounded-[2rem] shadow-sm border border-slate-100 p-6 sm:p-10 flex flex-col lg:flex-row gap-10 sm:gap-16">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- 4. CART VIEW -->
+        <div id="cart-view" class="view-section">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Your Cart</h2>
+                <span id="cart-item-count" class="text-sm text-slate-500 font-semibold bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">0 Items</span>
+            </div>
+            
+            <div class="flex flex-col lg:flex-row gap-8">
+                <div class="lg:w-2/3">
+                    <div id="cart-items-container" class="space-y-4">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+
+                <div class="lg:w-1/3">
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 sticky top-24">
+                        <h3 class="text-xl font-extrabold mb-6 text-slate-900 border-b border-slate-100 pb-4">Order Summary</h3>
+                        
+                        <div class="space-y-4 text-sm font-medium text-slate-600 mb-6">
+                            <div class="flex justify-between">
+                                <span>Subtotal</span>
+                                <span id="cart-subtotal" class="font-bold text-slate-900">₹0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Handling Fee</span>
+                                <span class="font-bold text-slate-900">₹20</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Shipping</span>
+                                <span id="cart-shipping" class="text-cyan-600 font-bold bg-cyan-50 px-2 py-0.5 rounded">FREE</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between mb-8 font-black text-2xl text-slate-900 pt-6 border-t border-slate-100">
+                            <span>Total</span>
+                            <span id="cart-total" class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-cyan-500">₹0</span>
+                        </div>
+                        
+                        <button onclick="navigate('checkout')" id="checkout-btn" class="btn-gradient w-full py-4 rounded-2xl font-bold text-base flex justify-center items-center shadow-lg shadow-indigo-500/30">
+                            Secure Checkout <i class="fa-solid fa-lock ml-2 text-sm"></i>
+                        </button>
+                        
+                        <div class="mt-6 flex justify-center items-center space-x-3 text-slate-300 text-2xl">
+                            <i class="fa-brands fa-cc-visa hover:text-slate-400 transition-colors"></i>
+                            <i class="fa-brands fa-cc-mastercard hover:text-slate-400 transition-colors"></i>
+                            <i class="fa-brands fa-cc-paypal hover:text-slate-400 transition-colors"></i>
+                            <i class="fa-brands fa-cc-apple-pay hover:text-slate-400 transition-colors"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. CHECKOUT VIEW -->
+        <div id="checkout-view" class="view-section">
+            <div class="max-w-3xl mx-auto bg-white rounded-[2rem] shadow-lg shadow-slate-200/50 border border-slate-100 p-8 sm:p-12">
+                <div class="flex items-center justify-between mb-10 border-b border-slate-100 pb-6">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Checkout</h2>
+                        <p class="text-sm font-medium text-slate-500 mt-1">Complete your order securely.</p>
+                    </div>
+                    <button onclick="navigate('cart')" class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                
+                <form id="checkout-form" onsubmit="processCheckout(event)" class="space-y-8">
+                    <div>
+                        <h3 class="text-base font-extrabold text-slate-800 mb-4 flex items-center"><span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs mr-2">1</span> Shipping Details</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">First Name</label>
+                                <input type="text" id="chk-fname" required class="input-aura">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Last Name</label>
+                                <input type="text" id="chk-lname" required class="input-aura">
+                            </div>
+                        </div>
+
+                        <div class="mb-5">
+                            <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Street Address</label>
+                            <textarea id="chk-address" required rows="2" placeholder="Building, Street, Area..." class="input-aura resize-none"></textarea>
+                        </div>
+                        
+                        <div class="bg-indigo-50/50 p-5 rounded-2xl border border-indigo-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <div class="text-center sm:text-left flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-indigo-500 shadow-sm mr-3"><i class="fa-solid fa-map-location-dot"></i></div>
+                                <div>
+                                    <p class="font-bold text-indigo-900 text-sm mb-0.5">GPS Verification</p>
+                                    <p id="location-status" class="text-xs text-indigo-600/70 font-medium">Pending detection...</p>
+                                </div>
+                            </div>
+                            <button type="button" onclick="captureLocation()" class="bg-white border-2 border-indigo-200 text-indigo-700 hover:border-indigo-600 hover:text-indigo-700 text-xs font-bold py-2.5 px-5 rounded-xl transition-all shadow-sm">
+                                Auto Detect
+                            </button>
+                            <input type="hidden" id="chk-lat">
+                            <input type="hidden" id="chk-lon">
+                        </div>
+                    </div>
+
+                    <div class="pt-8 border-t border-slate-100">
+                        <h3 class="text-base font-extrabold text-slate-800 mb-6 flex items-center"><span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs mr-2">2</span> Payment Option</h3>
+                        
+                        <div class="grid grid-cols-1 gap-4">
+                            <!-- Google Pay -->
+                            <label class="payment-label flex items-center p-5 border-2 border-slate-100 rounded-2xl cursor-pointer hover:border-indigo-200 transition-all group relative">
+                                <input type="radio" name="payment" value="gpay" class="w-5 h-5 text-indigo-600 focus:ring-indigo-600 accent-indigo-600">
+                                <div class="ml-4 flex-1">
+                                    <span class="block font-bold text-slate-900 text-base">Google Pay / UPI</span>
+                                    <span class="block text-xs font-medium text-slate-500 mt-0.5">Instant payment via UPI apps</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                     <i class="fa-brands fa-google-pay text-4xl text-slate-400 group-hover:text-indigo-600 transition-colors"></i>
+                                </div>
+                                <div class="payment-card absolute inset-0 rounded-2xl border-2 border-transparent pointer-events-none transition-all"></div>
+                            </label>
+
+                            <!-- Card Payment -->
+                            <label class="payment-label flex items-center p-5 border-2 border-slate-100 rounded-2xl cursor-pointer hover:border-indigo-200 transition-all group relative">
+                                <input type="radio" name="payment" value="card" class="w-5 h-5 text-indigo-600 focus:ring-indigo-600 accent-indigo-600">
+                                <div class="ml-4 flex-1">
+                                    <span class="block font-bold text-slate-900 text-base">Credit / Debit Card</span>
+                                    <span class="block text-xs font-medium text-slate-500 mt-0.5">Visa, Mastercard, RuPay</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-slate-400 group-hover:text-indigo-600 transition-colors">
+                                     <i class="fa-brands fa-cc-visa text-2xl"></i>
+                                     <i class="fa-brands fa-cc-mastercard text-2xl"></i>
+                                </div>
+                                <div class="payment-card absolute inset-0 rounded-2xl border-2 border-transparent pointer-events-none transition-all"></div>
+                            </label>
+
+                            <!-- Cash on Delivery -->
+                            <label class="payment-label flex items-center p-5 border-2 border-indigo-600 bg-indigo-50/30 rounded-2xl cursor-pointer shadow-sm shadow-indigo-100 relative overflow-hidden group">
+                                <div class="absolute top-0 right-0 bg-indigo-600 text-white text-[9px] font-black px-2.5 py-1 rounded-bl-lg z-10">RECOMMENDED</div>
+                                <input type="radio" name="payment" value="cod" checked class="w-5 h-5 text-indigo-600 focus:ring-indigo-600 accent-indigo-600">
+                                <div class="ml-4 flex-1">
+                                    <span class="block font-bold text-slate-900 text-base">Cash on Delivery</span>
+                                    <span class="block text-xs font-medium text-slate-500 mt-0.5">Cash, UPI, or Card at doorstep</span>
+                                </div>
+                                <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm text-indigo-500 border border-indigo-100">
+                                    <i class="fa-solid fa-wallet text-xl"></i>
+                                </div>
+                                <div class="payment-card absolute inset-0 rounded-2xl border-2 border-transparent pointer-events-none transition-all"></div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-10 pt-8 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-6 bg-slate-50 p-6 rounded-2xl">
+                        <div class="text-center sm:text-left">
+                            <span class="text-slate-500 text-xs font-bold uppercase tracking-wider block mb-1">Total Payable</span>
+                            <span id="checkout-total-display" class="text-3xl font-black text-slate-900 tracking-tight">₹0.00</span>
+                        </div>
+                        <button type="submit" class="btn-gradient w-full sm:w-auto px-12 py-4 rounded-xl font-bold text-base shadow-xl flex items-center justify-center">
+                            Place Order <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 6. CONTACT VIEW -->
+        <div id="contact-view" class="view-section">
+            <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-sm border border-slate-100 p-8 sm:p-12 text-center mt-8">
+                <div class="w-20 h-20 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-indigo-600 text-3xl shadow-inner border border-slate-100">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+                <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight mb-4">Contact Us</h2>
+                <p class="text-slate-500 font-medium mb-8 max-w-lg mx-auto">Have questions? We'd love to hear from you. Reach out to our support team for assistance.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                        <i class="fa-solid fa-envelope text-indigo-500 text-2xl mb-3"></i>
+                        <h3 class="font-bold text-slate-800 mb-1">Email Support</h3>
+                        <p class="text-sm text-slate-500">support@reddycart.com</p>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                        <i class="fa-solid fa-phone text-indigo-500 text-2xl mb-3"></i>
+                        <h3 class="font-bold text-slate-800 mb-1">Phone Support</h3>
+                        <p class="text-sm text-slate-500">+91 99999 99999</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. SIGN IN VIEW -->
+        <div id="signin-view" class="view-section">
+            <div class="max-w-sm mx-auto bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 sm:p-10 mt-10 text-center relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-500 to-cyan-400"></div>
+                
+                <!-- REDDY CART Custom Logo -->
+                <div class="w-20 h-20 bg-gradient-to-tr from-indigo-600 to-cyan-500 rounded-3xl flex items-center justify-center mx-auto mb-6 text-white shadow-xl shadow-indigo-500/30 hover:scale-105 transition-transform duration-300">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.5 13v6M10.5 13h2.5a1.5 1.5 0 010 3h-2.5M12 16l2 3"></path>
+                    </svg>
+                </div>
+                
+                <h2 class="text-2xl font-extrabold text-slate-900 mb-2 tracking-tight">Welcome to Reddy Cart.</h2>
+                <p class="text-slate-500 text-sm mb-8 font-medium">Verify your mobile to continue.</p>
+                
+                <form id="signin-form" onsubmit="handleAuthSubmit(event)">
+                    <div id="step-mobile" class="mb-6 text-left">
+                        <div class="relative flex items-center">
+                            <span class="absolute left-0 top-0 bottom-0 flex items-center pl-5 pr-3 text-slate-400 font-bold text-sm border-r border-slate-200">+91</span>
+                            <input type="tel" id="login-mobile" required pattern="[0-9]{10}" placeholder="Enter phone number" class="input-aura pl-[5rem] font-bold tracking-wide">
+                        </div>
+                    </div>
+
+                    <div id="step-otp" class="mb-6 hidden text-left">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide px-1">Security Code</label>
+                            <button type="button" onclick="resetAuthForm()" class="text-xs text-indigo-600 font-bold hover:bg-indigo-50 px-2 py-1 rounded transition-colors">Edit Number</button>
+                        </div>
+                        <input type="text" id="login-otp" pattern="[0-9]{4}" placeholder="● ● ● ●" maxlength="4" class="input-aura text-center tracking-[1em] font-black text-2xl">
+                        <p class="text-[11px] font-bold text-slate-400 mt-3 text-center bg-slate-50 py-1.5 rounded-lg border border-slate-100">Test OTP: <span class="text-indigo-600">1234</span></p>
+                    </div>
+
+                    <button type="submit" id="auth-submit-btn" class="btn-gradient w-full py-4 rounded-xl font-bold text-sm shadow-lg mt-2">Send Code</button>
+                </form>
+                <p class="text-[11px] text-slate-400 mt-8 font-medium">By continuing, you agree to our <a href="#" class="text-indigo-500 font-bold hover:underline">Terms</a></p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-12 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <!-- Footer Logo -->
+                <div class="flex items-center text-white">
+                    <div class="w-8 h-8 bg-gradient-to-tr from-indigo-600 to-cyan-400 rounded-lg flex items-center justify-center text-white mr-3 shadow-md">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10.5 13v6M10.5 13h2.5a1.5 1.5 0 010 3h-2.5M12 16l2 3"></path>
+                        </svg>
+                    </div>
+                    <span class="font-extrabold text-xl tracking-tight text-white">REDDY<span class="text-cyan-400">CART</span></span>
+                </div>
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-widest">© 2026 Reddy Cart India. All rights reserved.</p>
+                <div class="flex space-x-5">
+                    <div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-indigo-600 transition-all cursor-pointer"><i class="fa-brands fa-twitter"></i></div>
+                    <div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-indigo-600 transition-all cursor-pointer"><i class="fa-brands fa-instagram"></i></div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+    <script>
+        /* =========================================
+           1. DATABASE (Shared LocalStorage wrapper)
+           ========================================= */
+        const AppDB = {
+            init() {
+                let currentProducts = JSON.parse(localStorage.getItem('rk_products'));
+                if (!currentProducts || currentProducts.length < 30 || currentProducts[0].brand !== "REDDY") {
+                    const initialProducts = [
+                        { id: 1, name: "Aura Pro Wireless Headphones", price: 18999, mrp: 24999, rating: 4.9, reviews: 842, category: "electronics", stock: 15, image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80", description: "Studio-quality audio with advanced spatial noise cancellation.", featured: true, brand: "REDDY" },
+                        { id: 2, name: "Obsidian Leather Chronograph", price: 8999, mrp: 12499, rating: 4.7, reviews: 228, category: "accessories", stock: 20, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80", description: "Matte black finish with genuine Italian leather strap.", featured: true, brand: "REDDY" },
+                        { id: 3, name: "Aero Glide Running Sneakers", price: 5499, mrp: 8999, rating: 4.8, reviews: 1024, category: "fashion", stock: 10, image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80", description: "Ultra-lightweight foam sole for maximum kinetic return.", featured: true, brand: "REDDY" },
+                        { id: 4, name: "Creator Series Mirrorless Kit", price: 85999, mrp: 95999, rating: 4.9, reviews: 189, category: "electronics", stock: 5, image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&q=80", description: "4K 120fps capability with 5-axis body stabilization.", featured: true, brand: "REDDY" },
+                        { id: 5, name: "Polarized Horizon Aviators", price: 2999, mrp: 4999, rating: 4.5, reviews: 304, category: "accessories", stock: 30, image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=500&q=80", description: "Titanium alloy frame with UV400 polarized lenses.", featured: false, brand: "REDDY" },
+                        { id: 6, name: "Nomad Canvas Rucksack", price: 3499, mrp: 5999, rating: 4.7, reviews: 410, category: "accessories", stock: 25, image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&q=80", description: "Weather-resistant canvas with dedicated 16-inch laptop vault.", featured: false, brand: "REDDY" },
+                        { id: 7, name: "Nexus Smart Home Hub", price: 4599, mrp: 7999, rating: 4.6, reviews: 512, category: "electronics", stock: 12, image: "https://images.unsplash.com/photo-1589492477829-5e65395b66cc?w=500&q=80", description: "Control your entire home ecosystem with voice commands.", featured: true, brand: "REDDY" },
+                        { id: 8, name: "Tactile Pro Mechanical Board", price: 7999, mrp: 10999, rating: 4.8, reviews: 256, category: "electronics", stock: 8, image: "https://images.unsplash.com/photo-1595225476474-87563907a212?w=500&q=80", description: "Aircraft-grade aluminum frame with custom linear switches.", featured: false, brand: "REDDY" },
+                        { id: 9, name: "Aura X1 5G Smartphone", price: 74999, mrp: 84999, rating: 4.9, reviews: 1240, category: "electronics", stock: 18, image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&q=80", description: "120Hz OLED, Snapdragon Gen 3, and triple Leica cameras.", featured: true, brand: "REDDY" },
+                        { id: 10, name: "Stealth Wireless Earbuds", price: 4499, mrp: 7999, rating: 4.6, reviews: 820, category: "electronics", stock: 40, image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=500&q=80", description: "Invisible fit design with 40-hour total battery life.", featured: false, brand: "REDDY" },
+                        { id: 11, name: "Vintage Wash Denim Jacket", price: 3999, mrp: 6999, rating: 4.7, reviews: 215, category: "fashion", stock: 22, image: "https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=500&q=80", description: "Heavyweight 14oz denim with brass hardware.", featured: false, brand: "REDDY" },
+                        { id: 12, name: "Tailored Flex Chinos", price: 1899, mrp: 3999, rating: 4.5, reviews: 310, category: "fashion", stock: 35, image: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=500&q=80", description: "4-way stretch cotton twill for all-day comfort.", featured: false, brand: "REDDY" },
+                        { id: 13, name: "Crescent Silver Pendant", price: 2299, mrp: 3499, rating: 4.9, reviews: 195, category: "accessories", stock: 14, image: "https://images.unsplash.com/photo-1599643478514-4a4208bd121c?w=500&q=80", description: "Hand-polished 925 sterling silver minimalist pendant.", featured: false, brand: "REDDY" },
+                        { id: 14, name: "Quantum 4K OLED TV", price: 82999, mrp: 105999, rating: 4.8, reviews: 415, category: "electronics", stock: 6, image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=500&q=80", description: "Infinite contrast ratio with quantum dot technology.", featured: false, brand: "REDDY" },
+                        { id: 15, name: "AeroKnit Workout Tee", price: 1299, mrp: 2499, rating: 4.7, reviews: 640, category: "fashion", stock: 50, image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&q=80", description: "Seamless construction with targeted ventilation zones.", featured: false, brand: "REDDY" },
+                        { id: 16, name: "Executive Leather Wallet", price: 1799, mrp: 2999, rating: 4.8, reviews: 285, category: "accessories", stock: 28, image: "https://images.unsplash.com/photo-1627123424574-724758594e93?w=500&q=80", description: "Full-grain leather with carbon-fiber RFID shielding.", featured: false, brand: "REDDY" },
+                        { id: 17, name: "MagSync Charging Pad", price: 1499, mrp: 2599, rating: 4.5, reviews: 375, category: "electronics", stock: 45, image: "https://images.unsplash.com/photo-1586816879360-004f5b0c51e3?w=500&q=80", description: "15W magnetic alignment fast wireless charging.", featured: false, brand: "REDDY" },
+                        { id: 18, name: "Sculpt High-Waist Leggings", price: 1999, mrp: 3299, rating: 4.9, reviews: 890, category: "fashion", stock: 32, image: "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=500&q=80", description: "Squat-proof, buttery soft fabric with core control.", featured: false, brand: "REDDY" },
+                        { id: 19, name: "Titan 20000mAh Powerbank", price: 2499, mrp: 3999, rating: 4.7, reviews: 710, category: "electronics", stock: 60, image: "https://images.unsplash.com/photo-1609091839311-d5365f47d81a?w=500&q=80", description: "65W PD fast charging capable of powering laptops.", featured: false, brand: "REDDY" },
+                        { id: 20, name: "Merino Wool Blend Beanie", price: 899, mrp: 1599, rating: 4.6, reviews: 230, category: "accessories", stock: 25, image: "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=500&q=80", description: "Temperature regulating premium wool blend.", featured: false, brand: "REDDY" },
+                        { id: 21, name: "Halo Smart Desk Lamp", price: 2499, mrp: 4499, rating: 4.8, reviews: 320, category: "electronics", stock: 18, image: "https://images.unsplash.com/photo-1534073828943-f801091bb18c?w=500&q=80", description: "Eye-care LED tech with ambient RGB base lighting.", featured: false, brand: "REDDY" },
+                        { id: 22, name: "Saddle Leather Belt", price: 1499, mrp: 2499, rating: 4.6, reviews: 265, category: "fashion", stock: 40, image: "https://images.unsplash.com/photo-1624222247344-550fb60583dc?w=500&q=80", description: "Hand-dyed saddle leather with solid brass buckle.", featured: false, brand: "REDDY" },
+                        { id: 23, name: "AuraBlade 14 Ultrabook", price: 105999, mrp: 129999, rating: 4.9, reviews: 145, category: "electronics", stock: 4, image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&q=80", description: "M3 chip, 32GB RAM inside a 1.1kg aerospace chassis.", featured: true, brand: "REDDY" },
+                        { id: 24, name: "Oud Noir Eau de Parfum", price: 5999, mrp: 8499, rating: 4.8, reviews: 188, category: "accessories", stock: 16, image: "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=500&q=80", description: "Deep woody notes with Madagascar vanilla undertones.", featured: false, brand: "REDDY" },
+                        { id: 25, name: "Street Classic Sneakers", price: 3499, mrp: 5499, rating: 4.6, reviews: 410, category: "fashion", stock: 24, image: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=500&q=80", description: "Timeless silhouette with modern ortholite insoles.", featured: false, brand: "REDDY" },
+                        { id: 26, name: "Ergo Flow Wireless Mouse", price: 1899, mrp: 2999, rating: 4.5, reviews: 505, category: "electronics", stock: 35, image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=500&q=80", description: "Vertical ergonomic design prevents wrist strain.", featured: false, brand: "REDDY" },
+                        { id: 27, name: "Weekender Duffel Bag", price: 4499, mrp: 6499, rating: 4.9, reviews: 255, category: "accessories", stock: 10, image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&q=80", description: "Premium waxed canvas with leather reinforcements.", featured: false, brand: "REDDY" },
+                        { id: 28, name: "Oxford Crisp White Shirt", price: 2199, mrp: 3499, rating: 4.7, reviews: 290, category: "fashion", stock: 42, image: "https://images.unsplash.com/photo-1596755094514-f87e32f85e2c?w=500&q=80", description: "Non-iron Egyptian cotton for a sharp all-day look.", featured: false, brand: "REDDY" },
+                        { id: 29, name: "Studio ANC Earbuds", price: 6499, mrp: 10999, rating: 4.8, reviews: 380, category: "electronics", stock: 20, image: "https://images.unsplash.com/photo-1606220588913-b3aec5c8eb1c?w=500&q=80", description: "Hi-Res Audio certified with 6 microphones.", featured: false, brand: "REDDY" },
+                        { id: 30, name: "Mulberry Silk Scarf", price: 1499, mrp: 2299, rating: 4.8, reviews: 85, category: "accessories", stock: 15, image: "https://images.unsplash.com/photo-1601332800361-9c60e334d7ee?w=500&q=80", description: "100% pure Mulberry silk, hand-rolled edges.", featured: false, brand: "REDDY" }
+                    ];
+                    localStorage.setItem('rk_products', JSON.stringify(initialProducts));
+                }
+                if (!localStorage.getItem('rk_cart')) localStorage.setItem('rk_cart', JSON.stringify([]));
+                if (!localStorage.getItem('rk_orders')) localStorage.setItem('rk_orders', JSON.stringify([]));
+                if (!localStorage.getItem('rk_user')) localStorage.setItem('rk_user', JSON.stringify(null));
+                if (!localStorage.getItem('rk_users_list')) localStorage.setItem('rk_users_list', JSON.stringify([]));
+            },
+            getProducts() { return JSON.parse(localStorage.getItem('rk_products')); },
+            setProducts(data) { localStorage.setItem('rk_products', JSON.stringify(data)); },
+            getCart() { return JSON.parse(localStorage.getItem('rk_cart')); },
+            setCart(data) { localStorage.setItem('rk_cart', JSON.stringify(data)); },
+            getOrders() { return JSON.parse(localStorage.getItem('rk_orders')); },
+            addOrder(order) { 
+                const orders = this.getOrders();
+                orders.push(order);
+                localStorage.setItem('rk_orders', JSON.stringify(orders));
+            },
+            getUser() { return JSON.parse(localStorage.getItem('rk_user')); },
+            setUser(data) { localStorage.setItem('rk_user', JSON.stringify(data)); },
+            addUserToList(mobile) {
+                const users = JSON.parse(localStorage.getItem('rk_users_list'));
+                if (!users.includes(mobile)) {
+                    users.push(mobile);
+                    localStorage.setItem('rk_users_list', JSON.stringify(users));
+                }
+            }
+        };
+
+        /* =========================================
+           2. UTILS
+           ========================================= */
+        let currentCategory = 'all';
+        let currentMaxPrice = 100000;
+        let pendingCheckout = false; 
+        let otpSentState = false;    
+        const expectedOtp = "1234";  
+
+        function formatPrice(amount) {
+            return '₹' + amount.toLocaleString('en-IN');
+        }
+
+        function showToast(message, type = "success") {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast-enter flex items-center px-5 py-4 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] text-white font-bold text-sm z-50 border ${type === 'success' ? 'bg-slate-900 border-slate-700' : 'bg-rose-500 border-rose-400'}`;
+            const icon = type === 'success' ? '<i class="fa-solid fa-circle-check mr-3 text-cyan-400 text-lg"></i>' : '<i class="fa-solid fa-circle-exclamation mr-3 text-white text-lg"></i>';
+            toast.innerHTML = `${icon}<span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.replace('toast-enter', 'toast-leave'); setTimeout(() => toast.remove(), 400); }, 3000);
+        }
+
+        function updateAuthUI() {
+            const user = AppDB.getUser();
+            document.querySelectorAll('.signin-btn-text').forEach(btn => {
+                btn.innerText = user ? 'Logout' : 'Profile';
+            });
+        }
+
+        /* =========================================
+           3. INITIALIZATION
+           ========================================= */
+        document.addEventListener('DOMContentLoaded', () => {
+            AppDB.init();
+            updateAuthUI();
+            updateCartBadge(false); 
+            setupSearch();
+            navigate('home');
+        });
+
+        /* =========================================
+           4. NAVIGATION & AUTHENTICATION
+           ========================================= */
+        function handleAuthClick() {
+            const user = AppDB.getUser();
+            if (user) {
+                AppDB.setUser(null);
+                updateAuthUI();
+                showToast("Logged out successfully");
+                navigate('home');
+            } else {
+                pendingCheckout = false;
+                resetAuthForm();
+                navigate('signin');
+            }
+        }
+        
+        function handleAuthSubmit(event) {
+            event.preventDefault();
+            if (!otpSentState) {
+                const mobileInput = document.getElementById('login-mobile');
+                if (mobileInput.validity.valid) {
+                    document.getElementById('step-mobile').classList.add('hidden');
+                    document.getElementById('step-otp').classList.remove('hidden');
+                    
+                    const otpInput = document.getElementById('login-otp');
+                    otpInput.required = true;
+                    mobileInput.required = false; 
+                    
+                    document.getElementById('auth-submit-btn').innerText = 'Verify & Login';
+                    otpSentState = true;
+                    
+                    showToast(`OTP sent! Use ${expectedOtp}`, "success");
+                    setTimeout(() => otpInput.focus(), 100);
+                }
+            } else {
+                const otpInput = document.getElementById('login-otp');
+                const mobileInput = document.getElementById('login-mobile');
+                if (otpInput.value === expectedOtp) {
+                    const mobile = mobileInput.value;
+                    AppDB.setUser({ mobile: mobile, isAdmin: false });
+                    AppDB.addUserToList(mobile);
+                    updateAuthUI();
+                    
+                    showToast("Successfully signed in!", "success");
+                    resetAuthForm(); 
+                    
+                    if (pendingCheckout) { pendingCheckout = false; navigate('checkout'); } 
+                    else navigate('home');
+                } else {
+                    showToast("Invalid OTP. Try again.", "error");
+                    otpInput.value = ''; otpInput.focus();
+                }
+            }
+        }
+
+        function resetAuthForm() {
+            otpSentState = false;
+            document.getElementById('step-otp').classList.add('hidden');
+            document.getElementById('step-mobile').classList.remove('hidden');
+            document.getElementById('login-otp').required = false; document.getElementById('login-otp').value = '';
+            document.getElementById('login-mobile').required = true; document.getElementById('login-mobile').value = ''; 
+            document.getElementById('auth-submit-btn').innerText = 'Send Code';
+        }
+
+        function navigate(viewId, param = null) {
+            const user = AppDB.getUser();
+            if (viewId === 'checkout' && !user) {
+                pendingCheckout = true; resetAuthForm(); navigate('signin');
+                return showToast("Please login to place your order", "error");
+            }
+
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(`${viewId}-view`).classList.add('active');
+
+            if (viewId === 'home') renderFeaturedProducts();
+            else if (viewId === 'products') { filterCategory(param || 'all'); window.scrollTo({ top: 0, behavior: 'smooth' }); } 
+            else if (viewId === 'detail' && param) { renderProductDetail(param); window.scrollTo({ top: 0, behavior: 'smooth' }); } 
+            else if (viewId === 'cart') { renderCart(); window.scrollTo({ top: 0, behavior: 'smooth' }); } 
+            else if (viewId === 'contact') { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+            else if (viewId === 'signin') window.scrollTo({ top: 0, behavior: 'smooth' });
+            else if (viewId === 'checkout') {
+                const subtotal = AppDB.getCart().reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                document.getElementById('checkout-total-display').innerText = formatPrice(subtotal + 20 + (subtotal > 1000 ? 0 : 99));
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        /* =========================================
+           5. RENDERING FUNCTIONS
+           ========================================= */
+        function createProductCard(product) {
+            const discountPercent = Math.round(((product.mrp - product.price) / product.mrp) * 100);
+            return `
+                <div class="product-card bg-white rounded-[2rem] border border-slate-100 flex flex-col group cursor-pointer overflow-hidden relative" onclick="navigate('detail', ${product.id})">
+                    <!-- Image Box -->
+                    <div class="relative w-full aspect-[4/5] bg-slate-50 overflow-hidden">
+                        <img src="${product.image}" alt="${product.name}" class="absolute inset-0 w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-700 ease-out">
+                        
+                        <!-- Badges -->
+                        <div class="absolute top-4 left-4 flex flex-col gap-2 z-20">
+                            <div class="bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-xl text-[10px] font-extrabold text-slate-800 shadow-sm border border-white/50 flex items-center w-max">
+                                <i class="fa-solid fa-star text-amber-400 mr-1.5 text-[10px]"></i> ${product.rating}
+                            </div>
+                            ${discountPercent > 0 ? `<div class="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-2.5 py-1 rounded-xl text-[10px] font-black shadow-sm w-max tracking-wide">${discountPercent}% OFF</div>` : ''}
+                        </div>
+
+                        <!-- Quick Add Overlay (Hover) -->
+                        <div class="absolute inset-x-0 bottom-0 p-4 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 z-20 flex justify-center bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent">
+                            <button onclick="event.stopPropagation(); addToCart(${product.id})" class="w-full bg-white/20 backdrop-blur-md hover:bg-white text-white hover:text-indigo-600 border border-white/30 hover:border-white py-3 rounded-xl font-bold text-xs transition-colors flex items-center justify-center shadow-lg">
+                                <i class="fa-solid fa-bag-shopping mr-2"></i> QUICK ADD
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Details Box -->
+                    <div class="p-5 flex flex-col flex-grow bg-white z-10 relative">
+                        <div class="flex justify-between items-center mb-2.5">
+                            <span class="text-[10px] text-cyan-700 font-extrabold uppercase tracking-widest bg-cyan-50 px-2.5 py-1 rounded-lg border border-cyan-100/50">${product.brand}</span>
+                            ${product.stock > 0 && product.stock <= 5 ? `<span class="text-[9px] text-rose-500 font-bold flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse mr-1.5"></span> Few left</span>` : ''}
+                        </div>
+                        
+                        <h3 class="font-extrabold text-slate-900 text-sm sm:text-base leading-snug mb-1 line-clamp-1">${product.name}</h3>
+                        <p class="text-xs text-slate-500 font-medium mb-4 line-clamp-1">${product.description}</p>
+                        
+                        <div class="mt-auto flex items-end justify-between pt-4 border-t border-slate-50">
+                            <div class="flex flex-col">
+                                <span class="font-black text-slate-900 text-lg sm:text-xl tracking-tight">${formatPrice(product.price)}</span>
+                                ${product.mrp > product.price ? `<span class="text-[10px] sm:text-xs text-slate-400 line-through font-semibold">MRP ${formatPrice(product.mrp)}</span>` : ''}
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-all transform group-hover:rotate-0 -rotate-45 duration-300">
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderFeaturedProducts() {
+            const container = document.getElementById('featured-products-container');
+            container.innerHTML = AppDB.getProducts().filter(p => p.featured).slice(0, 4).map(createProductCard).join('');
+        }
+
+        function updateMobileFilter(cat) {
+            document.querySelectorAll('[id^="m-filter-"]').forEach(btn => {
+                btn.className = "px-5 py-2 rounded-xl bg-slate-50 text-slate-600 text-sm font-bold whitespace-nowrap border border-slate-200 transition-all";
+            });
+            document.getElementById('m-filter-' + cat).className = "px-5 py-2 rounded-xl bg-indigo-600 text-white text-sm font-bold whitespace-nowrap shadow-md shadow-indigo-500/20 transition-all";
+        }
+
+        function renderProducts(products, containerId) {
+            const container = document.getElementById(containerId);
+            if(containerId === 'all-products-container') {
+                const countEl = document.getElementById('listing-count');
+                if (countEl) countEl.innerText = `${products.length} Items`;
+            }
+            
+            if (products.length === 0) {
+                container.innerHTML = ''; document.getElementById('no-products-msg').classList.remove('hidden');
+            } else {
+                document.getElementById('no-products-msg').classList.add('hidden'); container.innerHTML = products.map(createProductCard).join('');
+            }
+        }
+
+        function renderProductDetail(productId) {
+            const product = AppDB.getProducts().find(p => p.id === productId);
+            if (!product) return;
+            document.getElementById('breadcrumb-product-name').innerText = product.name;
+
+            document.getElementById('product-detail-container').innerHTML = `
+                <div class="lg:w-5/12">
+                    <div class="w-full aspect-[4/5] bg-slate-50 rounded-3xl overflow-hidden relative border border-slate-100 shadow-inner">
+                        <img src="${product.image}" alt="${product.name}" class="absolute inset-0 w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="lg:w-7/12 flex flex-col py-4 px-2">
+                    <span class="text-xs font-black text-indigo-500 tracking-widest uppercase mb-3 bg-indigo-50 w-max px-3 py-1 rounded-lg">${product.brand}</span>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight mb-4">${product.name}</h1>
+                    
+                    <div class="flex items-center mb-8">
+                        <div class="bg-slate-900 text-white flex items-center px-3 py-1.5 rounded-lg text-sm font-bold mr-4 shadow-sm">
+                            <i class="fa-solid fa-star text-amber-400 mr-1.5 text-xs"></i> ${product.rating}
+                        </div>
+                        <span class="text-sm text-slate-500 font-semibold underline decoration-slate-300 underline-offset-4 cursor-pointer hover:text-indigo-600">${product.reviews} Verified Reviews</span>
+                    </div>
+
+                    <div class="mb-8">
+                        <div class="flex items-baseline gap-4 mb-2">
+                            <span class="text-4xl font-black text-slate-900 tracking-tight">${formatPrice(product.price)}</span>
+                            <span class="text-lg text-slate-400 line-through font-semibold">MRP ${formatPrice(product.mrp)}</span>
+                        </div>
+                        <p class="text-xs font-bold text-emerald-500 uppercase tracking-widest bg-emerald-50 w-max px-2 py-1 rounded">Inclusive of all taxes</p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-4 mb-10">
+                        <button onclick="addToCart(${product.id})" ${product.stock <= 0 ? 'disabled' : ''} class="btn-gradient flex-1 py-4 rounded-2xl font-bold text-base flex justify-center items-center shadow-lg shadow-indigo-500/30">
+                            <i class="fa-solid fa-bag-shopping mr-3"></i> ${product.stock <= 0 ? 'OUT OF STOCK' : 'ADD TO BAG'}
+                        </button>
+                    </div>
+                    
+                    <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
+                        <h3 class="font-extrabold text-slate-900 mb-3 uppercase tracking-wide text-sm flex items-center"><i class="fa-solid fa-bolt text-indigo-500 mr-2"></i> Details</h3>
+                        <p class="text-slate-600 leading-relaxed text-sm font-medium">${product.description}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        /* =========================================
+           6. CART LOGIC
+           ========================================= */
+        function updateCartBadge(animate = true) {
+            const qty = AppDB.getCart().reduce((sum, item) => sum + item.quantity, 0);
+            const badge = document.getElementById('cartBadge');
+            badge.innerText = qty;
+            if (qty > 0) { badge.classList.remove('hidden'); if (animate) { badge.classList.remove('animate-pop'); void badge.offsetWidth; badge.classList.add('animate-pop'); } } 
+            else badge.classList.add('hidden');
+        }
+
+        function addToCart(productId) {
+            const cart = AppDB.getCart(); const p = AppDB.getProducts().find(p => p.id === productId);
+            if (!p || p.stock <= 0) return showToast("Out of stock!", "error");
+            
+            const existing = cart.find(item => item.id === productId);
+            if (existing) { if(existing.quantity >= p.stock) return showToast(`Only ${p.stock} left in stock.`, "error"); existing.quantity++; } 
+            else cart.push({ ...p, quantity: 1 });
+
+            AppDB.setCart(cart); updateCartBadge(true); showToast(`Added to Bag`);
+            
+            // Re-render cart instantly if we are on the cart page
+            if(document.getElementById('cart-view').classList.contains('active')) renderCart();
+        }
+
+        function removeFromCart(productId) {
+            AppDB.setCart(AppDB.getCart().filter(item => item.id !== productId));
+            renderCart(); updateCartBadge(false); showToast("Item removed from Bag", "error");
+        }
+
+        function updateQuantity(productId, change) {
+            const cart = AppDB.getCart(); const item = cart.find(i => i.id === productId); const dbP = AppDB.getProducts().find(p => p.id === productId);
+            if (item && dbP) {
+                const newQ = item.quantity + change;
+                if(newQ > dbP.stock) return showToast(`Only ${dbP.stock} available.`, "error");
+                item.quantity = newQ;
+                if (item.quantity <= 0) removeFromCart(productId);
+                else { AppDB.setCart(cart); renderCart(); updateCartBadge(false); }
+            }
+        }
+
+        function renderCart() {
+            const cart = AppDB.getCart();
+            const countEl = document.getElementById('cart-item-count');
+            if(countEl) countEl.innerText = `${cart.reduce((s, i) => s + i.quantity, 0)} Items`;
+
+            if (cart.length === 0) {
+                document.getElementById('cart-items-container').innerHTML = `
+                    <div class="py-16 text-center text-slate-500 bg-white rounded-3xl border border-slate-100">
+                        <div class="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-slate-300 text-4xl"><i class="fa-solid fa-bag-shopping"></i></div>
+                        <h3 class="text-xl font-extrabold mb-2 text-slate-900">Your bag is empty</h3>
+                        <p class="text-sm font-medium mb-8">Add items to it now.</p>
+                        <button onclick="navigate('products', 'all')" class="bg-slate-900 text-white px-8 py-3 rounded-xl font-bold text-sm hover:bg-black transition-colors shadow-md">Shop Now</button>
+                    </div>`;
+                document.getElementById('cart-subtotal').innerText = '₹0'; document.getElementById('cart-shipping').innerText = '₹0'; document.getElementById('cart-total').innerText = '₹0';
+                document.getElementById('checkout-btn').disabled = true; return;
+            }
+
+            document.getElementById('checkout-btn').disabled = false; let subtotal = 0;
+            document.getElementById('cart-items-container').innerHTML = cart.map(item => {
+                const total = item.price * item.quantity; subtotal += total;
+                return `
+                    <div class="bg-white p-5 rounded-3xl border border-slate-100 flex flex-col sm:flex-row gap-5 relative group shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-24 h-24 bg-slate-50 rounded-2xl overflow-hidden flex-shrink-0 border border-slate-100"><img src="${item.image}" class="w-full h-full object-cover object-top"></div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <span class="text-[10px] font-black uppercase tracking-widest text-indigo-500 mb-1">${item.brand}</span>
+                                <button onclick="removeFromCart(${item.id})" class="text-slate-300 hover:text-rose-500 transition-colors p-1"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                            <h4 class="font-bold text-sm text-slate-900 leading-snug mb-3">${item.name}</h4>
+                            <div class="flex items-center justify-between mt-auto">
+                                <div class="flex items-center gap-1 bg-slate-50 rounded-lg p-1 border border-slate-200">
+                                    <button onclick="updateQuantity(${item.id}, -1)" class="w-8 h-8 rounded-md hover:bg-white hover:shadow-sm text-slate-600 font-bold transition-all">-</button>
+                                    <span class="w-8 text-center font-bold text-sm">${item.quantity}</span>
+                                    <button onclick="updateQuantity(${item.id}, 1)" class="w-8 h-8 rounded-md hover:bg-white hover:shadow-sm text-slate-600 font-bold transition-all">+</button>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-black text-slate-900 text-lg">${formatPrice(total)}</div>
+                                    <div class="text-xs text-slate-400 line-through font-medium">Rs. ${item.mrp * item.quantity}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+            }).join('');
+
+            const platformFee = 20;
+            const ship = subtotal > 1000 ? 0 : 99;
+            document.getElementById('cart-subtotal').innerText = formatPrice(subtotal);
+            document.getElementById('cart-shipping').innerText = ship === 0 ? 'FREE' : formatPrice(ship);
+            document.getElementById('cart-total').innerText = formatPrice(subtotal + platformFee + ship);
+        }
+
+        /* =========================================
+           7. CHECKOUT & LOCATION TRACKING
+           ========================================= */
+        function captureLocation() {
+            const statusEl = document.getElementById('location-status'); statusEl.innerText = "Locating...";
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        const lat = pos.coords.latitude;
+                        const lon = pos.coords.longitude;
+                        document.getElementById('chk-lat').value = lat; 
+                        document.getElementById('chk-lon').value = lon;
+                        statusEl.innerHTML = `Secured: <br> <span class="text-slate-900 font-bold">Lat:</span> ${lat.toFixed(6)}, <span class="text-slate-900 font-bold">Lon:</span> ${lon.toFixed(6)}`; 
+                        statusEl.className = 'text-xs text-indigo-600 font-bold leading-relaxed';
+                        showToast("Location captured!");
+                    },
+                    (error) => { statusEl.innerText = "Access denied"; statusEl.className = 'text-xs text-rose-500 font-bold'; }
+                );
+            } else statusEl.innerText = "Geolocation not supported";
+        }
+
+        function processCheckout(event) {
+            event.preventDefault();
+            const cart = AppDB.getCart(); const products = AppDB.getProducts(); const user = AppDB.getUser();
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const total = subtotal + 20 + (subtotal > 1000 ? 0 : 99);
+
+            let error = null; cart.forEach(c => { const p = products.find(x => x.id === c.id); if(!p || p.stock < c.quantity) error = `${c.name} is out of stock.`; });
+            if(error) return showToast(error, "error");
+
+            cart.forEach(c => { const p = products.find(x => x.id === c.id); p.stock -= c.quantity; });
+            AppDB.setProducts(products); 
+
+            AppDB.addOrder({
+                id: 'ORD-' + Math.floor(Math.random()*1000000), user: user.mobile, name: document.getElementById('chk-fname').value + ' ' + document.getElementById('chk-lname').value,
+                lat: document.getElementById('chk-lat').value || 'N/A', lon: document.getElementById('chk-lon').value || 'N/A', total: total, date: new Date().toISOString()
+            });
+
+            AppDB.setCart([]); updateCartBadge(false); showToast("Order placed successfully!", "success");
+            document.getElementById('checkout-form').reset(); document.getElementById('location-status').innerText = "Pending detection..."; document.getElementById('location-status').className = "text-xs text-indigo-600/70 font-medium";
+            setTimeout(() => { navigate('home'); }, 2000);
+        }
+
+        /* =========================================
+           8. SEARCH / FILTER
+           ========================================= */
+        function filterCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('input[name="cat"]').forEach(radio => { if (radio.value === cat) radio.checked = true; });
+            updateMobileFilter(cat);
+            document.getElementById('breadcrumb-category').innerText = cat === 'all' ? 'All Products' : cat.charAt(0).toUpperCase() + cat.slice(1);
+            applyFilters();
+        }
+
+        function updatePriceLabel(val) {
+            const formatted = '₹' + parseInt(val).toLocaleString('en-IN');
+            document.getElementById('desktop-price-label').innerText = formatted; document.getElementById('mobile-price-label').innerText = formatted;
+            document.getElementById('desktop-price-slider').value = val; document.getElementById('mobile-price-slider').value = val;
+        }
+
+        function filterByPrice(val) { currentMaxPrice = parseInt(val); applyFilters(); }
+
+        function applyFilters() {
+            let filtered = AppDB.getProducts().filter(p => p.price <= currentMaxPrice);
+            if (currentCategory !== 'all') filtered = filtered.filter(p => p.category === currentCategory);
+            
+            const query = (document.getElementById('searchInput').value || document.getElementById('mobileSearchInput').value).toLowerCase().trim();
+            if (query) {
+                filtered = filtered.filter(p => p.name.toLowerCase().includes(query) || p.brand.toLowerCase().includes(query));
+                document.getElementById('listing-title').innerText = `Search: "${query}"`;
+            } else {
+                document.getElementById('listing-title').innerText = currentCategory === 'all' ? 'The Catalog' : currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1);
+            }
+            renderProducts(filtered, 'all-products-container');
+        }
+
+        function setupSearch() {
+            const handleSearch = (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                if (e.target.id === 'searchInput') document.getElementById('mobileSearchInput').value = query; else document.getElementById('searchInput').value = query;
+                if (query === '') { if (document.getElementById('products-view').classList.contains('active')) applyFilters(); return; }
+                navigate('products'); document.getElementById('breadcrumb-category').innerText = `Search: ${query}`; applyFilters();
+            };
+            document.getElementById('searchInput').addEventListener('keyup', handleSearch); document.getElementById('mobileSearchInput').addEventListener('keyup', handleSearch);
+        }
+    </script>
+</body>
+</html>
