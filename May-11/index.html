@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aethelgard | The Master Horologists</title>
+    
+    <!-- Fonts: Classic Serif for Clocks, Modern Grotesk for UI -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Grotesk:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['Space Grotesk', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif']
+                    },
+                    colors: {
+                        base: '#050505',
+                        surface: '#0f0f11',
+                        gold: { 400: '#f5d061', 500: '#d4af37', 600: '#aa8a29' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        ::-webkit-scrollbar { display: none; }
+        
+        /* Custom Cursor */
+        #cursor-dot, #cursor-outline {
+            position: fixed;
+            top: 0; left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        #cursor-dot { width: 4px; height: 4px; background-color: #d4af37; }
+        #cursor-outline {
+            width: 40px; height: 40px;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        /* Crosshair lines inside cursor */
+        #cursor-outline::before, #cursor-outline::after {
+            content: ''; position: absolute; background: rgba(212, 175, 55, 0.4);
+        }
+        #cursor-outline::before { width: 100%; height: 1px; }
+        #cursor-outline::after { width: 1px; height: 100%; }
+
+        /* Animation 1: Chronosphere Rings */
+        .ring {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            transform-style: preserve-3d;
+        }
+        .ring-dashed { border-style: dashed; border-width: 2px; border-color: rgba(212, 175, 55, 0.4); }
+        .ring-dotted { border-style: dotted; border-width: 4px; border-color: rgba(255, 255, 255, 0.1); }
+        
+        /* Animation 2: Shattered Clock */
+        .roman-numeral {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform-origin: 50% 50%;
+            font-family: 'Playfair Display', serif;
+            color: #d4af37;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+        }
+        .clock-hand {
+            position: absolute;
+            bottom: 50%; left: 50%;
+            transform-origin: bottom center;
+            background: linear-gradient(to top, #d4af37, #fff);
+            border-radius: 4px;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Animation 3: Quantum Grid */
+        #clock-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .mini-clock {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            background: radial-gradient(circle at center, rgba(212,175,55,0.05) 0%, transparent 70%);
+        }
+        .mini-clock::after {
+            content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+            width: 4px; height: 4px; background:#d4af37; border-radius:50%;
+        }
+        .mini-hand {
+            position: absolute;
+            bottom: 50%; left: 50%;
+            width: 2px; height: 25px;
+            background: rgba(212, 175, 55, 0.8);
+            transform-origin: bottom center;
+            transform: translateX(-50%);
+            will-change: transform; /* Performance optimization for heavy JS */
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-gold-500 selection:text-base">
+
+    <div id="cursor-dot"></div>
+    <div id="cursor-outline"></div>
+
+    <!-- Header -->
+    <header class="fixed w-full z-50 top-0 py-6 px-8 flex justify-between items-center mix-blend-difference">
+        <div class="text-2xl font-serif text-gold-500 tracking-widest uppercase font-bold">Aethelgard</div>
+        <nav class="hidden md:flex gap-8 text-sm tracking-widest uppercase text-gray-400">
+            <a href="#container-1" class="hover:text-gold-400 transition-colors">The Sphere</a>
+            <a href="#container-2" class="hover:text-gold-400 transition-colors">The Fracture</a>
+            <a href="#container-3" class="hover:text-gold-400 transition-colors">The Grid</a>
+        </nav>
+        <button class="px-6 py-2 border border-gold-500/30 text-gold-500 text-sm tracking-widest uppercase hover:bg-gold-500 hover:text-base transition-all">
+            Enter Time
+        </button>
+    </header>
+
+    <!-- CONTAINER 1: THE CHRONOSPHERE (Heavy 3D Mouse Parallax & Continuous Rotation) -->
+    <section id="container-1" class="relative min-h-screen flex items-center justify-center overflow-hidden border-b border-white/10" style="perspective: 1200px;">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.05)_0%,transparent_50%)]"></div>
+        
+        <!-- Interactive 3D Wrapper -->
+        <div id="gyro-container" class="relative w-full max-w-[800px] aspect-square transform-style-3d flex items-center justify-center">
+            <!-- Layers of rings -->
+            <div class="ring w-[90%] h-[90%] ring-dashed chrono-ring" data-speed="15" data-dir="1"></div>
+            <div class="ring w-[75%] h-[75%] border-white/10 chrono-ring" data-speed="25" data-dir="-1"></div>
+            <div class="ring w-[60%] h-[60%] ring-dotted chrono-ring" data-speed="40" data-dir="1"></div>
+            <div class="ring w-[45%] h-[45%] border-gold-500/30 chrono-ring" data-speed="20" data-dir="-1">
+                <!-- Inner Clock Details -->
+                <div class="absolute inset-0 flex items-center justify-center font-serif text-gold-500/20 text-9xl">X</div>
+            </div>
+            
+            <!-- Central glowing core -->
+            <div class="absolute w-16 h-16 rounded-full bg-gold-500 shadow-[0_0_100px_rgba(212,175,55,0.8)] blur-[2px]"></div>
+        </div>
+
+        <!-- Foreground Text -->
+        <div class="absolute bottom-16 left-1/2 -translate-x-1/2 text-center pointer-events-none">
+            <h1 class="text-6xl md:text-8xl font-serif text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500 mb-4 tracking-tighter">
+                Chronosphere
+            </h1>
+            <p class="text-gold-500/70 tracking-[0.3em] uppercase text-sm">Move cursor to alter the axis</p>
+        </div>
+    </section>
+
+    <!-- CONTAINER 2: THE TIME FRACTURE (Heavy ScrollTrigger 3D Explosion) -->
+    <section id="container-2" class="relative bg-surface h-[350vh]">
+        <!-- Sticky viewport container -->
+        <div class="sticky top-0 h-screen flex items-center justify-center overflow-hidden w-full" style="perspective: 1500px;">
+            
+            <!-- Central Clock Face to be Shattered -->
+            <div id="shatter-clock" class="relative w-[600px] h-[600px] rounded-full border border-gold-500/20 flex items-center justify-center" style="transform-style: preserve-3d;">
+                
+                <!-- JS will inject Roman Numerals here -->
+                <div id="numerals-container" class="absolute inset-0"></div>
+
+                <!-- Clock Hands -->
+                <div class="clock-hand w-2 h-40 z-10" id="hour-hand" style="transform: translateX(-50%) rotate(0deg);"></div>
+                <div class="clock-hand w-1 h-56 z-10 bg-white shadow-[0_0_20px_#fff]" id="minute-hand" style="transform: translateX(-50%) rotate(90deg);"></div>
+                <div class="absolute w-6 h-6 rounded-full bg-gold-500 z-20 shadow-[0_0_20px_#d4af37]"></div>
+                
+                <!-- Background texture inside clock -->
+                <div class="absolute inset-4 rounded-full bg-[repeating-radial-gradient(circle_at_center,transparent_0,transparent_10px,rgba(255,255,255,0.02)_10px,rgba(255,255,255,0.02)_20px)] -z-10 shatter-bg"></div>
+            </div>
+
+            <!-- Text revealed during explosion -->
+            <div class="absolute text-center z-0 opacity-0 pointer-events-none" id="fracture-text">
+                <h2 class="text-5xl md:text-7xl font-serif text-white mb-4">Time is Relative.</h2>
+                <p class="text-gold-400 tracking-widest uppercase">The illusion of control</p>
+            </div>
+            
+            <div class="absolute bottom-10 left-1/2 -translate-x-1/2 text-gray-500 text-xs tracking-widest uppercase flex flex-col items-center gap-2">
+                Scroll to fracture time
+                <div class="w-px h-12 bg-gradient-to-b from-gray-500 to-transparent"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTAINER 3: THE QUANTUM GRID (Heavy Mouse Math & Rotation Engine) -->
+    <section id="container-3" class="relative min-h-screen bg-base py-32 border-t border-white/10 flex flex-col items-center justify-center overflow-hidden">
+        <div class="text-center mb-20 relative z-20">
+            <h2 class="text-4xl md:text-6xl font-serif text-gold-500 mb-4">The Quantum Grid</h2>
+            <p class="text-gray-400 tracking-widest uppercase text-sm">Every second points to the observer. Move your cursor.</p>
+        </div>
+
+        <!-- JS will populate this grid with hundreds of mini clocks -->
+        <div id="clock-grid" class="relative z-10 px-6"></div>
+        
+        <!-- Ambient background glow for grid -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gold-500/5 blur-[150px] rounded-full pointer-events-none"></div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 bg-base border-t border-white/5 text-center">
+        <div class="text-3xl font-serif text-gold-500 mb-6">Aethelgard</div>
+        <p class="text-gray-600 text-xs tracking-widest uppercase">© 2026 Master Horologists. Time awaits no one.</p>
+    </footer>
+
+    <!-- GSAP & Lenis Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.27/bundled/lenis.min.js"></script>
+
+    <script>
+        // --- 0. Setup Smooth Scrolling & Cursor ---
+        const lenis = new Lenis({ duration: 1.5, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+        requestAnimationFrame(raf);
+
+        gsap.registerPlugin(ScrollTrigger);
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+        gsap.ticker.lagSmoothing(0);
+
+        // Custom Cursor Logic
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorOutline = document.getElementById('cursor-outline');
+        const xToDot = gsap.quickTo(cursorDot, "x", {duration: 0.1, ease: "power3"});
+        const yToDot = gsap.quickTo(cursorDot, "y", {duration: 0.1, ease: "power3"});
+        const xToOutline = gsap.quickTo(cursorOutline, "x", {duration: 0.3, ease: "power3"});
+        const yToOutline = gsap.quickTo(cursorOutline, "y", {duration: 0.3, ease: "power3"});
+
+        window.addEventListener('mousemove', (e) => {
+            xToDot(e.clientX); yToDot(e.clientY);
+            xToOutline(e.clientX); yToOutline(e.clientY);
+        });
+
+
+        // ==========================================
+        // ANIMATION 1: The Chronosphere (3D Parallax & Infinite Rotation)
+        // ==========================================
+        const gyroContainer = document.getElementById('gyro-container');
+        const rings = document.querySelectorAll('.chrono-ring');
+
+        // Infinite rotation for rings
+        rings.forEach((ring, index) => {
+            const speed = ring.getAttribute('data-speed');
+            const dir = ring.getAttribute('data-dir');
+            gsap.to(ring, {
+                rotationZ: 360 * parseInt(dir),
+                duration: parseInt(speed),
+                repeat: -1,
+                ease: "none"
+            });
+            
+            // Give them a slight initial 3D tilt
+            gsap.set(ring, { rotationX: index * 15, rotationY: index * 10 });
+        });
+
+        // Mouse Parallax for the entire container
+        document.getElementById('container-1').addEventListener('mousemove', (e) => {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 20; // Calculate tilt X
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 20; // Calculate tilt Y
+            
+            gsap.to(gyroContainer, {
+                rotationY: xAxis,
+                rotationX: yAxis,
+                duration: 1,
+                ease: "power2.out"
+            });
+        });
+        
+        document.getElementById('container-1').addEventListener('mouseleave', () => {
+            gsap.to(gyroContainer, { rotationY: 0, rotationX: 0, duration: 1.5, ease: "power2.out" });
+        });
+
+
+        // ==========================================
+        // ANIMATION 2: The Time Fracture (Scroll Scrubbing Explosion)
+        // ==========================================
+        const numeralsContainer = document.getElementById('numerals-container');
+        const numerals = ['XII', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'];
+        const radius = 250; // Radius of the clock face
+
+        // Dynamically inject numerals in a perfect circle
+        numerals.forEach((num, index) => {
+            const angle = (index * 30) - 90; // 360deg / 12 = 30deg steps. -90 to start at top.
+            const rad = angle * (Math.PI / 180);
+            const x = Math.cos(rad) * radius;
+            const y = Math.sin(rad) * radius;
+            
+            const el = document.createElement('div');
+            el.className = 'roman-numeral text-3xl font-bold';
+            el.innerText = num;
+            
+            // Position exactly around the center, rotating them to face outward
+            gsap.set(el, { 
+                x: x, 
+                y: y, 
+                xPercent: -50, 
+                yPercent: -50,
+                rotationZ: angle + 90 
+            });
+            numeralsContainer.appendChild(el);
+        });
+
+        const allNumerals = document.querySelectorAll('.roman-numeral');
+        
+        // Setup the heavy scroll timeline
+        const fractureTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: "#container-2",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: 1.5, // Smooth scrubbing
+            }
+        });
+
+        // Frame 1: Time speeds up crazily
+        fractureTl.to('#minute-hand', { rotation: 360 * 10, duration: 2, ease: "power1.inOut" }, 0)
+                  .to('#hour-hand', { rotation: 360 * 2, duration: 2, ease: "power1.inOut" }, 0);
+
+        // Frame 2: The Fracture - elements explode into Z-space
+        allNumerals.forEach((numeral, i) => {
+            // Calculate random explosive coordinates
+            const randomX = (Math.random() - 0.5) * 1500;
+            const randomY = (Math.random() - 0.5) * 1500;
+            const randomZ = Math.random() * 1000;
+            const randomRotX = Math.random() * 720;
+            const randomRotY = Math.random() * 720;
+
+            fractureTl.to(numeral, {
+                x: randomX,
+                y: randomY,
+                z: randomZ,
+                rotationX: randomRotX,
+                rotationY: randomRotY,
+                opacity: 0,
+                duration: 2,
+                ease: "power2.in"
+            }, 1); // Start at 1s mark
+        });
+
+        // Explode the hands and background too
+        fractureTl.to(['#hour-hand', '#minute-hand', '.shatter-bg'], {
+            z: 500, rotationX: 180, opacity: 0, duration: 1.5
+        }, 1.2);
+
+        // Frame 3: Reveal hidden truth text
+        fractureTl.to('#fracture-text', {
+            opacity: 1, scale: 1.2, z: 200, duration: 1.5
+        }, 1.5);
+
+
+        // ==========================================
+        // ANIMATION 3: The Quantum Grid (Heavy Math Pointer Engine)
+        // ==========================================
+        const gridContainer = document.getElementById('clock-grid');
+        const numClocks = 120; // Massive grid of clocks
+        const setters = []; // Array to hold highly performant GSAP quickSetters
+
+        // Generate the DOM nodes
+        let gridHTML = '';
+        for(let i=0; i<numClocks; i++) {
+            gridHTML += `<div class="mini-clock"><div class="mini-hand hand-${i}"></div></div>`;
+        }
+        gridContainer.innerHTML = gridHTML;
+
+        // Map elements to their exact centers on the screen
+        const clocksData = [];
+        const hands = document.querySelectorAll('.mini-hand');
+
+        // Function to calculate and store centers (needs recalculation on resize)
+        function updateClockCenters() {
+            clocksData.length = 0; // clear
+            hands.forEach((hand, index) => {
+                const rect = hand.parentElement.getBoundingClientRect();
+                clocksData.push({
+                    x: rect.left + rect.width / 2,
+                    y: rect.top + rect.height / 2
+                });
+                
+                // Create a quickSetter for each hand for maximum performance in mousemove
+                if (!setters[index]) {
+                    setters[index] = gsap.quickSetter(hand, "rotation", "deg");
+                }
+            });
+        }
+
+        // Wait for layout, then calculate centers
+        setTimeout(updateClockCenters, 500);
+        window.addEventListener('resize', updateClockCenters);
+
+        // The heavy calculation engine
+        const container3 = document.getElementById('container-3');
+        
+        container3.addEventListener('mousemove', (e) => {
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+
+            // Loop through all 120 clocks and calculate angle to cursor instantly
+            for(let i=0; i<numClocks; i++) {
+                const data = clocksData[i];
+                if(!data) continue;
+                
+                const dx = mouseX - data.x;
+                const dy = mouseY - data.y;
+                
+                // Calculate angle in radians, convert to degrees
+                // Add 90 because the hand starts pointing UP (bottom: 50%)
+                let angle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
+                
+                // Apply rotation directly via quickSetter (bypasses regular GSAP tween for speed)
+                setters[i](angle);
+            }
+        });
+        
+        // When leaving grid, randomize them smoothly
+        container3.addEventListener('mouseleave', () => {
+             hands.forEach(hand => {
+                 gsap.to(hand, { rotation: Math.random() * 360, duration: 1.5, ease: "power2.out" });
+             });
+        });
+
+    </script>
+</body>
+</html>
